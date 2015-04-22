@@ -7,5 +7,69 @@
     tools:context=".MainActivity$PlaceholderFragment">
 
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <ImageView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView"
+            android:src="@drawable/login_logo"
+            android:layout_gravity="center_horizontal" />
+
+        <EditText
+            android:hint="Tài khoản của bạn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/txtLoginID"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginTop="20dp" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:hint="Mật khẩu của bạn"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:ems="10"
+            android:id="@+id/txtLoginPassword"
+            android:layout_gravity="center_horizontal"
+            android:singleLine="true"
+            android:gravity="center"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đăng nhập"
+            android:id="@+id/btnLogin"
+            android:layout_gravity="center_horizontal"
+            android:textAlignment="gravity"
+            android:singleLine="true" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Copyright © 2015 Hiếu Nguyễn. All Rights Reserved."
+            android:id="@+id/txtCopyRight"
+            android:layout_gravity="center_vertical|bottom"
+            android:gravity="center"
+            android:textAlignment="gravity"
+            android:textSize="11dp" />
+    </LinearLayout>
 
 </RelativeLayout>
