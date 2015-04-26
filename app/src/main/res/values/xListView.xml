@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="xlistview_header_hint_normal">Refresh Dropdown</string>
+    <string name="xlistview_header_hint_ready">Refeshing</string>
+    <string name="xlistview_header_hint_loading">Loading...</string>
+    <string name="xlistview_header_last_time">Last update:</string>
+    <string name="xlistview_footer_hint_normal">Load more</string>
+    <string name="xlistview_footer_hint_ready">Loading..</string>
+
+</resources>

@@ -56,5 +56,6 @@ public class MainActivity extends ActionBarActivity implements LoginFragment.Log
         fragmentManager.beginTransaction()
                 .replace(R.id.container, new MainFragment())
                 .commit();
+        getSupportActionBar().show();
     }
 }
