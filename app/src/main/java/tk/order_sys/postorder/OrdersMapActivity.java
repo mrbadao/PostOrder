@@ -5,40 +5,55 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdate;
+import com.directions.route.Route;
+import com.directions.route.Routing;
+import com.directions.route.RoutingListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
-import tk.order_sys.GPSTracer.GpsTracer;
+import java.util.ArrayList;
 
-public class OrdersMapActivity extends FragmentActivity implements LocationListener{
-    private static int MAP_ZOOM_DEFAULT =15;
+public class OrdersMapActivity extends FragmentActivity implements LocationListener, RoutingListener, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMarkerClickListener {
+    private static int MAP_ZOOM_DEFAULT = 15;
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATE = 0;
-    private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
+    private static final long MIN_TIME_BW_UPDATES = 1000 * 10 * 1;
+
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private ArrayList<Marker> mOrderMarkersArrayList;
+    private String mCurrenOrederMarkerIndex;
     LocationManager locationManager;
     String mProvider;
+    Location mCurrentLocation;
+    Polyline mRoutingLastPolyLine;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_orders_map);
 
+        mCurrentLocation = null;
+        mRoutingLastPolyLine = null;
+        mCurrenOrederMarkerIndex = null;
+        mOrderMarkersArrayList = new ArrayList<Marker>();
+
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         Criteria criteria = new Criteria();
-        mProvider = locationManager.getBestProvider(criteria,true);
+        mProvider = locationManager.getBestProvider(criteria, true);
 
-        locationManager.requestLocationUpdates(mProvider, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATE, this);
+        Log.i("Provider", mProvider);
 
         setUpMapIfNeeded();
     }
@@ -58,6 +73,8 @@ public class OrdersMapActivity extends FragmentActivity implements LocationListe
                     .getMap();
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
+                locationManager.requestLocationUpdates(mProvider, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATE, this);
+                mCurrentLocation = locationManager.getLastKnownLocation(mProvider);
                 setUpMap();
             }
         }
@@ -66,38 +83,22 @@ public class OrdersMapActivity extends FragmentActivity implements LocationListe
 
     private void setUpMap() {
         mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setTiltGesturesEnabled(true);
+        mMap.setOnMyLocationButtonClickListener(this);
 
-        Location mylocation = locationManager.getLastKnownLocation(mProvider);
-
-        if(mylocation!=null){
-            onLocationChanged(mylocation);
+        if (mCurrentLocation != null) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude())));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(MAP_ZOOM_DEFAULT));
         }
 
-        mMap.setMyLocationEnabled(true);
-        mMap.addMarker(new MarkerOptions().position(new LatLng(10.8000952, 106.61643240000001)).title("Poster"));
+        addOrderMarkers();
     }
 
     @Override
     public void onLocationChanged(Location location) {
-
-        // Getting latitude of the current location
-        double latitude = location.getLatitude();
-
-        // Getting longitude of the current location
-        double longitude = location.getLongitude();
-
-        // Creating a LatLng object for the current location
-        LatLng latLng = new LatLng(latitude, longitude);
-
-        // Showing the current location in Google Map
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        Polyline line = mMap.addPolyline(new PolylineOptions().
-                add(new LatLng(latitude,longitude),
-                        new LatLng(10.8000952,106.61643240000001))
-                .width(5).color(Color.RED));
-
-        // Zoom in the Google Map
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
+        mCurrentLocation = location;
     }
 
     @Override
@@ -108,14 +109,90 @@ public class OrdersMapActivity extends FragmentActivity implements LocationListe
     @Override
     public void onProviderEnabled(String provider) {
         Criteria criteria = new Criteria();
-        mProvider = locationManager.getBestProvider(criteria,true);
-        locationManager.requestLocationUpdates(mProvider, MIN_TIME_BW_UPDATES, 0, this);
+        mProvider = locationManager.getBestProvider(criteria, true);
+        locationManager.requestLocationUpdates(mProvider, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATE, this);
+        Log.i("Provider", mProvider);
     }
 
     @Override
     public void onProviderDisabled(String provider) {
         Criteria criteria = new Criteria();
-        mProvider = locationManager.getBestProvider(criteria,true);
-        locationManager.requestLocationUpdates(mProvider, MIN_TIME_BW_UPDATES, 0, this);
+        mProvider = locationManager.getBestProvider(criteria, true);
+        locationManager.requestLocationUpdates(mProvider, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATE, this);
+        Log.i("Provider", mProvider);
+    }
+
+    @Override
+    public void onRoutingFailure() {
+        mCurrenOrederMarkerIndex = null;
+    }
+
+    @Override
+    public void onRoutingStart() {
+
+    }
+
+    @Override
+    public void onRoutingSuccess(PolylineOptions mPolyOptions, Route route) {
+        if (mRoutingLastPolyLine != null) {
+            mRoutingLastPolyLine.remove();
+        }
+
+        PolylineOptions polyOptions = new PolylineOptions();
+        polyOptions.color(Color.RED);
+        polyOptions.width(5);
+        polyOptions.addAll(mPolyOptions.getPoints());
+
+        mRoutingLastPolyLine = mMap.addPolyline(polyOptions);
+
+        if(mCurrenOrederMarkerIndex != null){
+            for (int i=0; i < mOrderMarkersArrayList.size(); i++){
+                if (mOrderMarkersArrayList.get(i).getId().equals(mCurrenOrederMarkerIndex)){
+                    mOrderMarkersArrayList.get(i);
+                }
+            }
+        }
+
+        Toast.makeText(
+                getApplicationContext(),
+                "Khoảng cách: " + route.getDistanceText() + "\n" + "Thời gian dự tính: " + route.getDurationText(),
+                Toast.LENGTH_SHORT
+        ).show();
+
+
+
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        Routing mRouting = new Routing(Routing.TravelMode.DRIVING);
+        mRouting.registerListener(this);
+        mRouting.execute(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), marker.getPosition());
+        mCurrenOrederMarkerIndex = marker.getId();
+        Log.i("MarkerIdx",mCurrenOrederMarkerIndex);
+        return false;
+    }
+
+    private void addOrderMarkers() {
+        mOrderMarkersArrayList.add(mMap.addMarker(
+                 new MarkerOptions().position(
+                         new LatLng(10.8000952, 106.61643240000001))
+                         .title("AEONMALL Tan Phu Celadon")
+
+        ));
+
+        mOrderMarkersArrayList.add(mMap.addMarker(new MarkerOptions().position(new LatLng(10.8124513, 106.67860859999996)).title("Big C Gò Vấp")));
+        mOrderMarkersArrayList.add(mMap.addMarker(new MarkerOptions().position(new LatLng(10.801811572755648, 106.64007067680359)).title("Etown")));
+
+        mMap.setOnMarkerClickListener(this);
+    }
+
+    @Override
+    public boolean onMyLocationButtonClick() {
+        if (mCurrentLocation != null) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude())));
+        }
+        return false;
     }
 }

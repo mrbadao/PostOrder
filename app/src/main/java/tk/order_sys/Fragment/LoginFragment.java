@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import tk.order_sys.postorder.MainActivity;
 import tk.order_sys.postorder.R;
 
 /**
@@ -25,6 +26,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        ((MainActivity)getActivity()).onShowHideActionBar(false);
         delegate = (LoginInterface) getActivity();
 
         rootView = inflater.inflate(R.layout.fragment_login, container, false);

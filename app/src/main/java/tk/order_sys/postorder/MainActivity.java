@@ -20,7 +20,7 @@ public class MainActivity extends ActionBarActivity implements LoginFragment.Log
         setContentView(R.layout.activity_main);
 
 //        check login here
-        getSupportActionBar().hide();
+//        getSupportActionBar().hide();
 
         fragmentManager = getSupportFragmentManager();
 
@@ -57,5 +57,10 @@ public class MainActivity extends ActionBarActivity implements LoginFragment.Log
                 .replace(R.id.container, new MainFragment())
                 .commit();
         getSupportActionBar().show();
+    }
+
+    public void onShowHideActionBar(boolean flag){
+        if (flag) getSupportActionBar().show();
+        else getSupportActionBar().hide();
     }
 }

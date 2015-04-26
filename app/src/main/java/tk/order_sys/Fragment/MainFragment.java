@@ -20,6 +20,7 @@ import java.util.Date;
 
 import tk.order_sys.XListView.view.XListView;
 import tk.order_sys.config.appConfig;
+import tk.order_sys.postorder.MainActivity;
 import tk.order_sys.postorder.OrdersMapActivity;
 import tk.order_sys.postorder.R;
 
@@ -46,7 +47,10 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        ((MainActivity)getActivity()).onShowHideActionBar(true);
+
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
         sharedPreferences = getActivity().getSharedPreferences(appConfig.getSharePreferenceTag(), Context.MODE_PRIVATE);
 
         if(sharedPreferences.contains(appConfig.getSharePreferenceTag(LIST_ORDERS_TAG))){
