@@ -20,7 +20,8 @@ public class MainActivity extends ActionBarActivity implements LoginFragment.Log
         setContentView(R.layout.activity_main);
 
 //        check login here
-//        getSupportActionBar().hide();
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setIcon(R.drawable.actionbar_logo);
 
         fragmentManager = getSupportFragmentManager();
 

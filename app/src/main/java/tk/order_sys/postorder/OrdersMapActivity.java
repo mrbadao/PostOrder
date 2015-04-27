@@ -16,6 +16,7 @@ import com.directions.route.RoutingListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -147,8 +148,10 @@ public class OrdersMapActivity extends FragmentActivity implements LocationListe
 
         if(mCurrenOrederMarkerIndex != null){
             for (int i=0; i < mOrderMarkersArrayList.size(); i++){
+                mOrderMarkersArrayList.get(i).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                 if (mOrderMarkersArrayList.get(i).getId().equals(mCurrenOrederMarkerIndex)){
                     mOrderMarkersArrayList.get(i);
+                    mOrderMarkersArrayList.get(i).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                 }
             }
         }
@@ -179,11 +182,20 @@ public class OrdersMapActivity extends FragmentActivity implements LocationListe
                  new MarkerOptions().position(
                          new LatLng(10.8000952, 106.61643240000001))
                          .title("AEONMALL Tan Phu Celadon")
-
+                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
         ));
 
-        mOrderMarkersArrayList.add(mMap.addMarker(new MarkerOptions().position(new LatLng(10.8124513, 106.67860859999996)).title("Big C Gò Vấp")));
-        mOrderMarkersArrayList.add(mMap.addMarker(new MarkerOptions().position(new LatLng(10.801811572755648, 106.64007067680359)).title("Etown")));
+        mOrderMarkersArrayList.add(mMap.addMarker(new MarkerOptions().position(
+                new LatLng(10.8124513, 106.67860859999996))
+                .title("Big C Gò Vấp")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+        ));
+
+        mOrderMarkersArrayList.add(mMap.addMarker(new MarkerOptions().position(
+                        new LatLng(10.801811572755648, 106.64007067680359))
+                        .title("Etown")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+        ));
 
         mMap.setOnMarkerClickListener(this);
     }
