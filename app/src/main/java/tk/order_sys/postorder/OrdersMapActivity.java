@@ -1,11 +1,14 @@
 package tk.order_sys.postorder;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Toast;
@@ -35,6 +38,7 @@ public class OrdersMapActivity extends FragmentActivity implements LocationListe
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private ArrayList<Marker> mOrderMarkersArrayList;
     private String mCurrenOrederMarkerIndex;
+    SharedPreferences mSharedPreferences;
     LocationManager locationManager;
     String mProvider;
     Location mCurrentLocation;
@@ -50,6 +54,11 @@ public class OrdersMapActivity extends FragmentActivity implements LocationListe
         mRoutingLastPolyLine = null;
         mCurrenOrederMarkerIndex = null;
         mOrderMarkersArrayList = new ArrayList<Marker>();
+
+        mSharedPreferences = getApplicationContext().getSharedPreferences("", Context.MODE_PRIVATE);
+        SharedPreferences.Editor mPreferenceEditor = mSharedPreferences.edit();
+
+
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         Criteria criteria = new Criteria();
@@ -131,12 +140,13 @@ public class OrdersMapActivity extends FragmentActivity implements LocationListe
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        if(mCurrentLocation != null){
+        if (mCurrentLocation != null) {
             outState.putDouble("mCurrentLocation_Lat", mCurrentLocation.getLatitude());
             outState.putDouble("mCurrentLocation_Lng", mCurrentLocation.getLongitude());
         }
 
-        if(mCurrenOrederMarkerIndex != null) outState.putString("mCurrenOrederMarkerIndex", mCurrenOrederMarkerIndex);
+        if (mCurrenOrederMarkerIndex != null)
+            outState.putString("mCurrenOrederMarkerIndex", mCurrenOrederMarkerIndex);
 
         super.onSaveInstanceState(outState);
     }
@@ -159,10 +169,10 @@ public class OrdersMapActivity extends FragmentActivity implements LocationListe
 
         mRoutingLastPolyLine = mMap.addPolyline(polyOptions);
 
-        if(mCurrenOrederMarkerIndex != null){
-            for (int i=0; i < mOrderMarkersArrayList.size(); i++){
+        if (mCurrenOrederMarkerIndex != null) {
+            for (int i = 0; i < mOrderMarkersArrayList.size(); i++) {
                 mOrderMarkersArrayList.get(i).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                if (mOrderMarkersArrayList.get(i).getId().equals(mCurrenOrederMarkerIndex)){
+                if (mOrderMarkersArrayList.get(i).getId().equals(mCurrenOrederMarkerIndex)) {
                     mOrderMarkersArrayList.get(i);
                     mOrderMarkersArrayList.get(i).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                 }
@@ -176,7 +186,6 @@ public class OrdersMapActivity extends FragmentActivity implements LocationListe
         ).show();
 
 
-
         mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
     }
 
@@ -186,28 +195,28 @@ public class OrdersMapActivity extends FragmentActivity implements LocationListe
         mRouting.registerListener(this);
         mRouting.execute(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), marker.getPosition());
         mCurrenOrederMarkerIndex = marker.getId();
-        Log.i("MarkerIdx",mCurrenOrederMarkerIndex);
+        Log.i("MarkerIdx", mCurrenOrederMarkerIndex);
         return false;
     }
 
     private void addOrderMarkers() {
         mOrderMarkersArrayList.add(mMap.addMarker(
-                 new MarkerOptions().position(
-                         new LatLng(10.8000952, 106.61643240000001))
-                         .title("AEONMALL Tan Phu Celadon")
-                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                new MarkerOptions().position(
+                        new LatLng(10.8000952, 106.61643240000001))
+                        .title("AEONMALL Tan Phu Celadon")
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
         ));
 
         mOrderMarkersArrayList.add(mMap.addMarker(new MarkerOptions().position(
-                new LatLng(10.8124513, 106.67860859999996))
-                .title("Big C Gò Vấp")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                        new LatLng(10.8124513, 106.67860859999996))
+                        .title("Big C Gò Vấp")
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
         ));
 
         mOrderMarkersArrayList.add(mMap.addMarker(new MarkerOptions().position(
                         new LatLng(10.801811572755648, 106.64007067680359))
                         .title("Etown")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
         ));
 
         mMap.setOnMarkerClickListener(this);
