@@ -27,6 +27,7 @@ import java.util.ArrayList;
 
 public class OrdersMapActivity extends FragmentActivity implements LocationListener, RoutingListener, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMarkerClickListener {
     private static int MAP_ZOOM_DEFAULT = 15;
+    private static String MMAP_TAG = "mMap";
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATE = 0;
     private static final long MIN_TIME_BW_UPDATES = 1000 * 10 * 1;
 
@@ -126,6 +127,18 @@ public class OrdersMapActivity extends FragmentActivity implements LocationListe
     @Override
     public void onRoutingFailure() {
         mCurrenOrederMarkerIndex = null;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        if(mCurrentLocation != null){
+            outState.putDouble("mCurrentLocation_Lat", mCurrentLocation.getLatitude());
+            outState.putDouble("mCurrentLocation_Lng", mCurrentLocation.getLongitude());
+        }
+
+        if(mCurrenOrederMarkerIndex != null) outState.putString("mCurrenOrederMarkerIndex", mCurrenOrederMarkerIndex);
+
+        super.onSaveInstanceState(outState);
     }
 
     @Override
