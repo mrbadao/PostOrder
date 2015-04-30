@@ -2,15 +2,18 @@ package tk.order_sys.PostOrderService;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 
 import tk.order_sys.config.appConfig;
@@ -19,16 +22,19 @@ import tk.order_sys.config.appConfig;
  * Created by mrbadao on 30/04/2015.
  */
 public class OrderTracingService extends Service implements LocationListener{
+    private static String CURRENT_LOCATION_TAG = "mCurrentLocation";
+
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATE = 0;
     private static final long MIN_TIME_BW_UPDATES = 1000 * 10 * 1;
 
     private LocationManager locationManager;
     private String mProvider;
-    Location mCurrentLocation;
+    LatLng mCurrentLocation;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        mCurrentLocation = null;
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         mProvider = locationManager.getBestProvider(criteria, true);
@@ -37,10 +43,17 @@ public class OrderTracingService extends Service implements LocationListener{
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        mCurrentLocation = locationManager.getLastKnownLocation(mProvider);
+        Location location = locationManager.getLastKnownLocation(mProvider);
+        if(location != null){
+            mCurrentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+        }else {
+            mCurrentLocation = loadSavedLocation();
+        }
+
         if (mCurrentLocation != null){
             reportLocation();
         }
+
         return START_STICKY;
     }
 
@@ -57,7 +70,7 @@ public class OrderTracingService extends Service implements LocationListener{
 
     @Override
     public void onLocationChanged(Location location) {
-        mCurrentLocation = location;
+        mCurrentLocation = new LatLng(location.getLatitude(), location.getLongitude());
         reportLocation();
     }
 
@@ -88,5 +101,18 @@ public class OrderTracingService extends Service implements LocationListener{
             Intent localIntent = new Intent(appConfig.BROADCAST_LOCATION_ACTION).putExtra(appConfig.DATA_LOCATION_STATUS, jsonCurrentLocation);
             LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
         }
+    }
+
+    private LatLng loadSavedLocation(){
+        SharedPreferences mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        Gson gson = new Gson();
+        LatLng latLng = null;
+
+        if (mSharedPreferences.contains(CURRENT_LOCATION_TAG)) {
+            String jsonCurrentLocation = mSharedPreferences.getString(CURRENT_LOCATION_TAG, null);
+            latLng = gson.fromJson(jsonCurrentLocation, LatLng.class);
+        }
+
+        return latLng;
     }
 }

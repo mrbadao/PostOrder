@@ -1,5 +1,6 @@
 package tk.order_sys.postorder;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -44,9 +45,11 @@ public class MainActivity extends ActionBarActivity implements LoginFragment.Log
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id){
+            case R.id.action_map:
+                Intent intentOrdersMap = new Intent(getApplicationContext(), OrdersMapActivity.class);
+                startActivity(intentOrdersMap);
+                return true;
         }
 
         return super.onOptionsItemSelected(item);

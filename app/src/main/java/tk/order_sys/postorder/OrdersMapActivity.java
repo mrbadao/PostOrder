@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
@@ -52,7 +51,7 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
     private Routing.TravelMode mTravelMode;
 
     SharedPreferences mSharedPreferences = null;
-    Location mCurrentLocation;
+    LatLng mCurrentLocation;
     LatLng mLastOrderLocation;
     Polyline mRoutingLastPolyLine;
     LocationReceiver mCurrentLocationReceiver;
@@ -126,13 +125,13 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
         onMyLocationButtonClick();
 
         if (mCurrentLocation != null) {
-            LatLng currentLatLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+//            LatLng currentLatLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
 
             if (mLastOrderLocation != null) {
-                getRouting(currentLatLng, mLastOrderLocation, mTravelMode);
+                getRouting(mCurrentLocation, mLastOrderLocation, mTravelMode);
 
             } else {
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(mCurrentLocation));
                 mMap.animateCamera(CameraUpdateFactory.zoomTo(MAP_MY_LOCATION_ZOOM_DEFAULT));
             }
         }
@@ -151,7 +150,6 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
 
     @Override
     public void onRoutingSuccess(PolylineOptions mPolyOptions, Route route) {
-        LatLng currentLatLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
 
         if (mRoutingLastPolyLine != null) {
             mRoutingLastPolyLine.remove();
@@ -176,7 +174,7 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
 
         txtStatus.setText("Khoảng cách: " + route.getDistanceText() + "\n" + "Thời gian dự tính: " + route.getDurationText());
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(mCurrentLocation));
     }
 
     @Override
@@ -186,7 +184,7 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
             mCurrenOrederMarkerIndex = marker.getId();
             mLastOrderLocation = marker.getPosition();
 
-            getRouting(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), mLastOrderLocation, mTravelMode);
+            getRouting(mCurrentLocation, mLastOrderLocation, mTravelMode);
 
         }
         return false;
@@ -277,12 +275,12 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
 
         if (jsonCurrentLocation != null) {
             Gson gson = new Gson();
-            mCurrentLocation = gson.fromJson(jsonCurrentLocation, Location.class);
+            mCurrentLocation = gson.fromJson(jsonCurrentLocation, LatLng.class);
 
             if (mLastOrderLocation != null) {
-                getRouting(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), mLastOrderLocation, mTravelMode);
+                getRouting(mCurrentLocation, mLastOrderLocation, mTravelMode);
             } else {
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude())));
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(mCurrentLocation));
                 mMap.animateCamera(CameraUpdateFactory.zoomTo(MAP_MY_LOCATION_ZOOM_DEFAULT));
             }
         }
