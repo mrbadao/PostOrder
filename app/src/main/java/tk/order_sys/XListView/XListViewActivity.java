@@ -26,7 +26,7 @@ package tk.order_sys.XListView;//package tk.order_sys.orderapp.XListView;
 //		geneItems();
 //		mListView = (XListView) findViewById(R.id.xListView);
 //		mListView.setPullLoadEnable(true);
-//		mAdapter = new ArrayAdapter<String>(this, R.layout.list_item, items);
+//		mAdapter = new ArrayAdapter<String>(this, R.layout.orders_list_item, items);
 //		mListView.setAdapter(mAdapter);
 ////		mListView.setPullLoadEnable(false);
 ////		mListView.setPullRefreshEnable(false);
@@ -55,7 +55,7 @@ package tk.order_sys.XListView;//package tk.order_sys.orderapp.XListView;
 //				items.clear();
 //				geneItems();
 //				// mAdapter.notifyDataSetChanged();
-//				mAdapter = new ArrayAdapter<String>(XListViewActivity.this, R.layout.list_item, items);
+//				mAdapter = new ArrayAdapter<String>(XListViewActivity.this, R.layout.orders_list_item, items);
 //				mListView.setAdapter(mAdapter);
 //				onLoad();
 //			}

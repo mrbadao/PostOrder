@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.os.Handler;
 
 import java.text.DateFormat;
@@ -18,8 +17,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import tk.order_sys.Adapter.OrdersAdapter;
 import tk.order_sys.XListView.view.XListView;
 import tk.order_sys.config.appConfig;
+import tk.order_sys.models.ContentOrder;
 import tk.order_sys.postorder.MainActivity;
 import tk.order_sys.postorder.OrdersMapActivity;
 import tk.order_sys.postorder.R;
@@ -34,8 +35,8 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
     private View rootView;
     private SharedPreferences sharedPreferences;
     private XListView xListViewOrders;
-    private ArrayAdapter<String> mAdapter;
-    private ArrayList<String> listOrders = new ArrayList<String>();
+    private OrdersAdapter mAdapter;
+    private ArrayList<ContentOrder> listOrders = new ArrayList<ContentOrder>();
     private Handler mHandler;
 
     private int start = 0;
@@ -58,7 +59,7 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
 
         getOrders();
 
-        mAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item, listOrders);
+        mAdapter = new OrdersAdapter(getActivity().getApplicationContext(), R.layout.orders_list_item,listOrders);
 
         xListViewOrders = (XListView) rootView.findViewById(R.id.xListViewOrders);
         xListViewOrders.setPullLoadEnable(true);
@@ -78,7 +79,8 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
 
     private void getOrders() {
         for (int i = 0; i != 20; ++i) {
-            listOrders.add("Order_" + (++start));
+//            listOrders.add("Order_" + (++start));
+            listOrders.add(new ContentOrder("1","Order_" + String.valueOf(++start), "1","1","1","1","1","1","1","1"));
         }
     }
 
@@ -99,7 +101,7 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
                 listOrders.clear();
                 getOrders();
                 // mAdapter.notifyDataSetChanged();
-                mAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item, listOrders);
+                mAdapter = new OrdersAdapter(getActivity(), R.layout.orders_list_item, listOrders);
                 xListViewOrders.setAdapter(mAdapter);
                 onLoad();
             }
