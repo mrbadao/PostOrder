@@ -1,17 +1,17 @@
 package tk.order_sys.postorder;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.directions.route.Route;
 import com.directions.route.Routing;
@@ -25,24 +25,38 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
-public class OrdersMapActivity extends FragmentActivity implements LocationListener, RoutingListener, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMarkerClickListener {
-    private static int MAP_ZOOM_DEFAULT = 15;
-    private static String MMAP_TAG = "mMap";
+import tk.order_sys.PostOrderBroadcastReceiver.LocationReceiver;
+import tk.order_sys.PostOrderInterface.LocationReceiverInterface;
+import tk.order_sys.PostOrderService.OrderTracingService;
+import tk.order_sys.config.appConfig;
+
+public class OrdersMapActivity extends FragmentActivity implements LocationReceiverInterface, RoutingListener, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMarkerClickListener {
+    private static String APP_TAG = "PostOrder";
+    private static String LAST_ORDER_LOCATION_TAG = "mLastOrderLocation";
+    private static String CURRENT_LOCATION_TAG = "mCurrentLocation";
+    private static int MAP_ZOOM_DEFAULT = 12;
+    private static int MAP_MY_LOCATION_ZOOM_DEFAULT = 15;
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATE = 0;
     private static final long MIN_TIME_BW_UPDATES = 1000 * 10 * 1;
 
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private TextView txtStatus;
     private ArrayList<Marker> mOrderMarkersArrayList;
     private String mCurrenOrederMarkerIndex;
-    SharedPreferences mSharedPreferences;
-    LocationManager locationManager;
-    String mProvider;
+
+    private Routing.TravelMode mTravelMode;
+
+    SharedPreferences mSharedPreferences = null;
     Location mCurrentLocation;
+    LatLng mLastOrderLocation;
     Polyline mRoutingLastPolyLine;
+    LocationReceiver mCurrentLocationReceiver;
+
 
 
     @Override
@@ -50,21 +64,24 @@ public class OrdersMapActivity extends FragmentActivity implements LocationListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_orders_map);
 
+        txtStatus = (TextView) findViewById(R.id.txtOrderStatus);
+
+        Intent mOrderTracingService = new Intent(OrdersMapActivity.this, OrderTracingService.class);
+        mOrderTracingService.setAction("tk.order_sys.postorder.startforeground");
+        startService(mOrderTracingService);
+
         mCurrentLocation = null;
         mRoutingLastPolyLine = null;
+        mLastOrderLocation = null;
         mCurrenOrederMarkerIndex = null;
+        mTravelMode = Routing.TravelMode.DRIVING;
         mOrderMarkersArrayList = new ArrayList<Marker>();
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mCurrentLocationReceiver = new LocationReceiver(this);
 
-        mSharedPreferences = getApplicationContext().getSharedPreferences("", Context.MODE_PRIVATE);
-        SharedPreferences.Editor mPreferenceEditor = mSharedPreferences.edit();
+        IntentFilter mLocationIntentFilter = new IntentFilter(appConfig.BROADCAST_LOCATION_ACTION);
 
-
-
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        mProvider = locationManager.getBestProvider(criteria, true);
-
-        Log.i("Provider", mProvider);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mCurrentLocationReceiver, mLocationIntentFilter);
 
         setUpMapIfNeeded();
     }
@@ -75,22 +92,28 @@ public class OrdersMapActivity extends FragmentActivity implements LocationListe
         setUpMapIfNeeded();
     }
 
+    @Override
+    protected void onPause() {
+        saveData();
+        super.onPause();
+    }
 
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
+
             // Try to obtain the map from the SupportMapFragment.
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
+            mMap.setPadding(0,50,0,0);
+
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
-                locationManager.requestLocationUpdates(mProvider, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATE, this);
-                mCurrentLocation = locationManager.getLastKnownLocation(mProvider);
+                loadSavedData();
                 setUpMap();
             }
         }
     }
-
 
     private void setUpMap() {
         mMap.setMyLocationEnabled(true);
@@ -98,57 +121,28 @@ public class OrdersMapActivity extends FragmentActivity implements LocationListe
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setTiltGesturesEnabled(true);
         mMap.setOnMyLocationButtonClickListener(this);
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(MAP_ZOOM_DEFAULT));
+        addOrderMarkers();
+
+        onMyLocationButtonClick();
 
         if (mCurrentLocation != null) {
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude())));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(MAP_ZOOM_DEFAULT));
+            LatLng currentLatLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+
+            if (mLastOrderLocation != null) {
+                getRouting(currentLatLng, mLastOrderLocation, mTravelMode);
+
+            }else {
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(MAP_MY_LOCATION_ZOOM_DEFAULT));
+            }
         }
-
-        addOrderMarkers();
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        mCurrentLocation = location;
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-        Criteria criteria = new Criteria();
-        mProvider = locationManager.getBestProvider(criteria, true);
-        locationManager.requestLocationUpdates(mProvider, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATE, this);
-        Log.i("Provider", mProvider);
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-        Criteria criteria = new Criteria();
-        mProvider = locationManager.getBestProvider(criteria, true);
-        locationManager.requestLocationUpdates(mProvider, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATE, this);
-        Log.i("Provider", mProvider);
     }
 
     @Override
     public void onRoutingFailure() {
         mCurrenOrederMarkerIndex = null;
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        if (mCurrentLocation != null) {
-            outState.putDouble("mCurrentLocation_Lat", mCurrentLocation.getLatitude());
-            outState.putDouble("mCurrentLocation_Lng", mCurrentLocation.getLongitude());
-        }
-
-        if (mCurrenOrederMarkerIndex != null)
-            outState.putString("mCurrenOrederMarkerIndex", mCurrenOrederMarkerIndex);
-
-        super.onSaveInstanceState(outState);
+        mLastOrderLocation = null;
     }
 
     @Override
@@ -158,6 +152,8 @@ public class OrdersMapActivity extends FragmentActivity implements LocationListe
 
     @Override
     public void onRoutingSuccess(PolylineOptions mPolyOptions, Route route) {
+        LatLng currentLatLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+
         if (mRoutingLastPolyLine != null) {
             mRoutingLastPolyLine.remove();
         }
@@ -179,27 +175,33 @@ public class OrdersMapActivity extends FragmentActivity implements LocationListe
             }
         }
 
-        Toast.makeText(
-                getApplicationContext(),
-                "Khoảng cách: " + route.getDistanceText() + "\n" + "Thời gian dự tính: " + route.getDurationText(),
-                Toast.LENGTH_SHORT
-        ).show();
+        txtStatus.setText("Khoảng cách: " + route.getDistanceText() + "\n" + "Thời gian dự tính: " + route.getDurationText());
 
-
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        Routing mRouting = new Routing(Routing.TravelMode.DRIVING);
-        mRouting.registerListener(this);
-        mRouting.execute(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), marker.getPosition());
-        mCurrenOrederMarkerIndex = marker.getId();
-        Log.i("MarkerIdx", mCurrenOrederMarkerIndex);
+        if (mCurrentLocation != null) {
+
+            mCurrenOrederMarkerIndex = marker.getId();
+            mLastOrderLocation = marker.getPosition();
+
+            getRouting(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), mLastOrderLocation, mTravelMode);
+
+        }
         return false;
     }
 
     private void addOrderMarkers() {
+
+        if (mOrderMarkersArrayList.size() > 0) {
+            Log.i("Maker", "restore");
+            return;
+        }
+
+        Log.i("Maker", "new");
+
         mOrderMarkersArrayList.add(mMap.addMarker(
                 new MarkerOptions().position(
                         new LatLng(10.8000952, 106.61643240000001))
@@ -224,9 +226,66 @@ public class OrdersMapActivity extends FragmentActivity implements LocationListe
 
     @Override
     public boolean onMyLocationButtonClick() {
-        if (mCurrentLocation != null) {
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude())));
-        }
         return false;
+    }
+
+    public void saveData() {
+        if (mSharedPreferences == null) return;
+
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        Gson gson = new Gson();
+
+        if (mLastOrderLocation != null) {
+            String jsonLastOrderLocation = gson.toJson(mLastOrderLocation);
+            editor.putString(LAST_ORDER_LOCATION_TAG, jsonLastOrderLocation);
+        }
+
+        if(mCurrentLocation != null){
+            String jsonCurrentLocation = gson.toJson(mCurrentLocation);
+            editor.putString(CURRENT_LOCATION_TAG, jsonCurrentLocation);
+        }
+
+        editor.commit();
+    }
+
+    public void loadSavedData() {
+        if (mSharedPreferences == null) return;
+
+        Gson gson = new Gson();
+
+        if (mSharedPreferences.contains(LAST_ORDER_LOCATION_TAG)) {
+            String jsonLastOrderLocation = mSharedPreferences.getString(LAST_ORDER_LOCATION_TAG, null);
+            mLastOrderLocation = gson.fromJson(jsonLastOrderLocation, LatLng.class);
+        }
+
+        if(mSharedPreferences.contains(CURRENT_LOCATION_TAG) && mCurrentLocation == null){
+            String jsonCurrentLocation = mSharedPreferences.getString(CURRENT_LOCATION_TAG, null);
+//            mCurrentLocation = gson.fromJson(jsonCurrentLocation, Location.class);
+        }
+    }
+
+    private void getRouting(LatLng fromLatLng, LatLng toLatLng, Routing.TravelMode travelMode) {
+        if (fromLatLng != null && toLatLng != null) {
+            Routing mRouting = new Routing(travelMode);
+            mRouting.registerListener(this);
+            mRouting.execute(fromLatLng, toLatLng);
+        }
+    }
+
+    @Override
+    public void onCurrentLocationReceived(Context context, Intent intent) {
+        String jsonCurrentLocation = intent.getStringExtra(appConfig.DATA_LOCATION_STATUS);
+
+        if(jsonCurrentLocation != null){
+            Gson gson = new Gson();
+            mCurrentLocation = gson.fromJson(jsonCurrentLocation, Location.class);
+
+            if(mLastOrderLocation != null){
+                getRouting(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), mLastOrderLocation, mTravelMode);
+            }else {
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()) ));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(MAP_MY_LOCATION_ZOOM_DEFAULT));
+            }
+        }
     }
 }

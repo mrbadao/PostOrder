@@ -22,6 +22,7 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".MainActivity"
+            android:launchMode="singleTask"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -39,12 +40,18 @@
 
         <activity
             android:name=".OrdersMapActivity"
+            android:launchMode="singleTask"
             android:parentActivityName=".MainActivity"
             android:label="@string/title_activity_orders_map" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+
+        <service android:name="tk.order_sys.PostOrderService.OrderTracingService"
+                 android:exported="false">
+
+        </service>
     </application>
 
 </manifest>

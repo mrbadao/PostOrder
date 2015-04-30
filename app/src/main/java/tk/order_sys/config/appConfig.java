@@ -12,6 +12,9 @@ public class appConfig {
     private static final String _remoteApiUrl = "http://mapi.order-sys.tk/";
     private static final String _localApiUrl = "http://mapi.order-sys.tk/";
     private static final String _sharePreferenceTag = "tk.order_sys.postorder";
+    public static final String BROADCAST_LOCATION_ACTION = "tk.order_sys.postorder.BROADCAST_LOCATION";
+    public static final String DATA_LOCATION_STATUS = "tk.order_sys.postorder.myLocation";
+
 
     public static String getSharePreferenceTag(String tag){
         return _sharePreferenceTag + "." + tag;
