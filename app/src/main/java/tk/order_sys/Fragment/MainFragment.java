@@ -79,7 +79,6 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
 
     private void getOrders() {
         for (int i = 0; i != 20; ++i) {
-//            listOrders.add("Order_" + (++start));
             listOrders.add(new ContentOrder("1","Order_" + String.valueOf(++start), "1","1","1","1","1","1","1","1"));
         }
     }

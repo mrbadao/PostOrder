@@ -19,7 +19,7 @@
             android:id="@+id/imageView"
             android:src="@drawable/login_logo"
             android:layout_gravity="center_horizontal|bottom"
-            android:layout_marginTop="30dp" />
+            android:layout_marginTop="10dp" />
 
         <EditText
             android:singleLine="true"
@@ -54,6 +54,15 @@
             android:layout_gravity="center_horizontal"
             android:textAlignment="gravity"
             android:singleLine="true" />
+
+        <ProgressBar
+            android:layout_marginTop="5dp"
+            android:id="@+id/xlistview_footer_progressbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center_horizontal"
+            android:visibility="invisible" />
 
     </LinearLayout>
 
