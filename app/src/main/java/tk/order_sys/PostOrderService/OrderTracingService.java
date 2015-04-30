@@ -33,15 +33,14 @@ public class OrderTracingService extends Service implements LocationListener{
         Criteria criteria = new Criteria();
         mProvider = locationManager.getBestProvider(criteria, true);
         locationManager.requestLocationUpdates(mProvider, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATE, this);
-        mCurrentLocation = locationManager.getLastKnownLocation(mProvider);
-        if (mCurrentLocation != null){
-            reportLocation();
-        }
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
+        mCurrentLocation = locationManager.getLastKnownLocation(mProvider);
+        if (mCurrentLocation != null){
+            reportLocation();
+        }
         return START_STICKY;
     }
 

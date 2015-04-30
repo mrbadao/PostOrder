@@ -58,7 +58,6 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
     LocationReceiver mCurrentLocationReceiver;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,7 +104,7 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
             // Try to obtain the map from the SupportMapFragment.
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
-            mMap.setPadding(0,50,0,0);
+            mMap.setPadding(0, 50, 0, 0);
 
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
@@ -132,7 +131,7 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
             if (mLastOrderLocation != null) {
                 getRouting(currentLatLng, mLastOrderLocation, mTravelMode);
 
-            }else {
+            } else {
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
                 mMap.animateCamera(CameraUpdateFactory.zoomTo(MAP_MY_LOCATION_ZOOM_DEFAULT));
             }
@@ -240,7 +239,7 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
             editor.putString(LAST_ORDER_LOCATION_TAG, jsonLastOrderLocation);
         }
 
-        if(mCurrentLocation != null){
+        if (mCurrentLocation != null) {
             String jsonCurrentLocation = gson.toJson(mCurrentLocation);
             editor.putString(CURRENT_LOCATION_TAG, jsonCurrentLocation);
         }
@@ -258,7 +257,7 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
             mLastOrderLocation = gson.fromJson(jsonLastOrderLocation, LatLng.class);
         }
 
-        if(mSharedPreferences.contains(CURRENT_LOCATION_TAG) && mCurrentLocation == null){
+        if (mSharedPreferences.contains(CURRENT_LOCATION_TAG) && mCurrentLocation == null) {
             String jsonCurrentLocation = mSharedPreferences.getString(CURRENT_LOCATION_TAG, null);
 //            mCurrentLocation = gson.fromJson(jsonCurrentLocation, Location.class);
         }
@@ -276,14 +275,14 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
     public void onCurrentLocationReceived(Context context, Intent intent) {
         String jsonCurrentLocation = intent.getStringExtra(appConfig.DATA_LOCATION_STATUS);
 
-        if(jsonCurrentLocation != null){
+        if (jsonCurrentLocation != null) {
             Gson gson = new Gson();
             mCurrentLocation = gson.fromJson(jsonCurrentLocation, Location.class);
 
-            if(mLastOrderLocation != null){
+            if (mLastOrderLocation != null) {
                 getRouting(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), mLastOrderLocation, mTravelMode);
-            }else {
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()) ));
+            } else {
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude())));
                 mMap.animateCamera(CameraUpdateFactory.zoomTo(MAP_MY_LOCATION_ZOOM_DEFAULT));
             }
         }
