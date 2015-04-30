@@ -4,13 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.os.Handler;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -22,7 +22,7 @@ import tk.order_sys.XListView.view.XListView;
 import tk.order_sys.config.appConfig;
 import tk.order_sys.models.ContentOrder;
 import tk.order_sys.postorder.MainActivity;
-import tk.order_sys.postorder.OrdersMapActivity;
+import tk.order_sys.postorder.OrderDetailActivity;
 import tk.order_sys.postorder.R;
 
 /**
@@ -68,7 +68,9 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
         xListViewOrders.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intentOrdersMap = new Intent(getActivity().getApplicationContext(), OrdersMapActivity.class);
+//                Intent intentOrdersMap = new Intent(getActivity().getApplicationContext(), OrdersMapActivity.class);
+//                getActivity().startActivityForResult(intentOrdersMap,ORDERS_MAPS_ACTIVITY_CODE);
+                Intent intentOrdersMap = new Intent(getActivity().getApplicationContext(), OrderDetailActivity.class);
                 getActivity().startActivityForResult(intentOrdersMap,ORDERS_MAPS_ACTIVITY_CODE);
             }
         });
