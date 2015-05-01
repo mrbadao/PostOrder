@@ -18,7 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import tk.order_sys.postorder.R;
+import tk.order_sys.Postorder.R;
 
 public class XListViewHeader extends LinearLayout {
 	private LinearLayout mContainer;

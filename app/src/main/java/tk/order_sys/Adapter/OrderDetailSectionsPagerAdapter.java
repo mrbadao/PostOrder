@@ -9,7 +9,7 @@ import java.util.Locale;
 
 import tk.order_sys.Fragment.OrderDetailInfoFragment;
 import tk.order_sys.Fragment.OrderDetailProductsFragment;
-import tk.order_sys.postorder.R;
+import tk.order_sys.Postorder.R;
 
 /**
  * Created by mrbadao on 01/05/2015.

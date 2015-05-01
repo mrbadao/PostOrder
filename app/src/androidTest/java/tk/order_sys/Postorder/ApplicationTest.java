@@ -1,4 +1,4 @@
-package tk.order_sys.postorder;
+package tk.order_sys.Postorder;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

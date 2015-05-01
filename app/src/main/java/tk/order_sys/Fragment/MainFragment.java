@@ -18,12 +18,12 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import tk.order_sys.Adapter.OrdersAdapter;
+import tk.order_sys.Postorder.MainActivity;
+import tk.order_sys.Postorder.OrderDetailActivity;
+import tk.order_sys.Postorder.R;
 import tk.order_sys.XListView.view.XListView;
 import tk.order_sys.config.appConfig;
 import tk.order_sys.models.ContentOrder;
-import tk.order_sys.postorder.MainActivity;
-import tk.order_sys.postorder.OrderDetailActivity;
-import tk.order_sys.postorder.R;
 
 /**
  * Created by HieuNguyen on 4/22/2015.

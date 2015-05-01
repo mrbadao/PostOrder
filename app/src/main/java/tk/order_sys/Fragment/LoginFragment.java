@@ -4,15 +4,13 @@ package tk.order_sys.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
-import tk.order_sys.postorder.MainActivity;
-import tk.order_sys.postorder.R;
+import tk.order_sys.Postorder.MainActivity;
+import tk.order_sys.Postorder.R;
 
 /**
  * Created by HieuNguyen on 4/22/2015.

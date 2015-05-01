@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import tk.order_sys.postorder.R;
+import tk.order_sys.Postorder.R;
 
 /**
  * Created by mrbadao on 30/04/2015.

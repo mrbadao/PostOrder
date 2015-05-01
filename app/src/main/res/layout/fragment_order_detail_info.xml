@@ -1,6 +1,6 @@
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="tk.order_sys.postorder.OrderDetailActivity"
+    tools:context="tk.order_sys.Postorder.OrderDetailActivity"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:stretchColumns="2"

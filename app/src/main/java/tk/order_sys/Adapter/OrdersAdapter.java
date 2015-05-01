@@ -11,8 +11,8 @@ import org.json.JSONArray;
 
 import java.util.ArrayList;
 
+import tk.order_sys.Postorder.R;
 import tk.order_sys.models.ContentOrder;
-import tk.order_sys.postorder.R;
 
 /**
  * Created by HieuNguyen on 4/17/2015.
