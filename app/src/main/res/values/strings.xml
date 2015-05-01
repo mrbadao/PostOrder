@@ -1,10 +1,9 @@
 <resources>
     <string name="app_name">PostOrder</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Cài đặt</string>
     <string name="action_map">Bản đồ</string>
     <string name="title_activity_orders_map">Bản đồ đơn hàng</string>
-    <string name="title_activity_order_detail">OrderDetailActivity</string>
+    <string name="title_activity_order_detail">Chi tiết</string>
 
 
     <string name="title_order_info">Thông tin</string>

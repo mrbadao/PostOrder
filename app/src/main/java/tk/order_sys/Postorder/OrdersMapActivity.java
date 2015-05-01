@@ -254,11 +254,6 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
             String jsonLastOrderLocation = mSharedPreferences.getString(LAST_ORDER_LOCATION_TAG, null);
             mLastOrderLocation = gson.fromJson(jsonLastOrderLocation, LatLng.class);
         }
-
-        if (mSharedPreferences.contains(CURRENT_LOCATION_TAG) && mCurrentLocation == null) {
-            String jsonCurrentLocation = mSharedPreferences.getString(CURRENT_LOCATION_TAG, null);
-//            mCurrentLocation = gson.fromJson(jsonCurrentLocation, Location.class);
-        }
     }
 
     private void getRouting(LatLng fromLatLng, LatLng toLatLng, Routing.TravelMode travelMode) {

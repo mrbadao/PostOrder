@@ -30,7 +30,7 @@ import tk.order_sys.models.ContentOrder;
  */
 public class MainFragment extends Fragment implements XListView.IXListViewListener {
     private static final String LIST_ORDERS_TAG = "listOrders";
-    private static final int ORDERS_MAPS_ACTIVITY_CODE = 101;
+    private static final int ORDERS_DETAIL_ACTIVITY_CODE = 101;
 
     private View rootView;
     private SharedPreferences sharedPreferences;
@@ -68,10 +68,8 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
         xListViewOrders.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Intent intentOrdersMap = new Intent(getActivity().getApplicationContext(), OrdersMapActivity.class);
-//                getActivity().startActivityForResult(intentOrdersMap,ORDERS_MAPS_ACTIVITY_CODE);
-                Intent intentOrdersMap = new Intent(getActivity().getApplicationContext(), OrderDetailActivity.class);
-                getActivity().startActivityForResult(intentOrdersMap,ORDERS_MAPS_ACTIVITY_CODE);
+                Intent intentOrderDetail = new Intent(getActivity().getApplicationContext(), OrderDetailActivity.class);
+                getActivity().startActivityForResult(intentOrderDetail,ORDERS_DETAIL_ACTIVITY_CODE);
             }
         });
 

@@ -1,5 +1,6 @@
 package tk.order_sys.Postorder;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
@@ -12,7 +13,7 @@ import tk.order_sys.Adapter.OrderDetailSectionsPagerAdapter;
 
 
 public class OrderDetailActivity extends ActionBarActivity implements ActionBar.TabListener {
-
+    private static final int ORDERS_MAPS_ACTIVITY_CODE = 102;
     OrderDetailSectionsPagerAdapter mSectionsPagerAdapter;
 
     ViewPager mViewPager;
@@ -66,9 +67,11 @@ public class OrderDetailActivity extends ActionBarActivity implements ActionBar.
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id){
+            case R.id.action_map:
+                Intent intentOrdersMap = new Intent(OrderDetailActivity.this, OrdersMapActivity.class);
+                startActivityForResult(intentOrdersMap, ORDERS_MAPS_ACTIVITY_CODE);
+                return true;
         }
 
         return super.onOptionsItemSelected(item);

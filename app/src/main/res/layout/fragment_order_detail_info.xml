@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="tk.order_sys.Postorder.OrderDetailActivity"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="fill_parent"
     android:stretchColumns="2"
     android:id="@+id/tableLayoutOrderDetailInfo"
     android:paddingLeft="2dp"
@@ -71,36 +71,6 @@
     </TableRow>
 
     <TableRow android:layout_marginTop="-1.8dp">
-        <TextView android:id="@+id/txtOrderDetailInfoLabelAddress"
-            android:layout_width="0dp"
-            android:text="Địa chỉ"
-            android:textSize="16dp"
-            android:textStyle="bold"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:textAlignment="gravity"
-            android:gravity="left|center_vertical"
-            android:layout_gravity="center_vertical"
-            android:padding="5dp"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:background="@drawable/order_detail_info_cell_shape"
-            />
-
-        <TextView android:id="@+id/txtOrderDetailInfoAddress"
-            android:layout_width="0dp"
-            android:text="487/3 NTT, RG, KG"
-            android:layout_weight="1"
-            android:textSize="16dp"
-            android:layout_height="wrap_content"
-            android:gravity="left|center_vertical"
-            android:padding="5dp"
-            android:layout_marginLeft="-1.8dp"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:background="@drawable/order_detail_info_cell_shape"
-            android:textAlignment="gravity" />
-    </TableRow>
-
-    <TableRow android:layout_marginTop="-1.8dp">
         <TextView android:id="@+id/txtOrderDetailInfoLabelCreated"
             android:layout_width="0dp"
             android:text="Ngày đặt"
@@ -118,7 +88,7 @@
 
         <TextView android:id="@+id/txtOrderDetailInfoCreated"
             android:layout_width="0dp"
-            android:text="30/04/2015"
+            android:text="19:20 30/04/2015"
             android:layout_weight="1"
             android:textSize="16dp"
             android:layout_height="wrap_content"
@@ -130,5 +100,51 @@
             android:textAlignment="gravity" />
     </TableRow>
 
+    <TableRow android:layout_marginTop="-1.8dp">
+        <TextView android:id="@+id/txtOrderDetailInfoOrderName"
+            android:layout_width="0dp"
+            android:text="MS: Order_14142015"
+            android:layout_weight="1"
+            android:textSize="16dp"
+            android:layout_height="wrap_content"
+            android:gravity="left|center_vertical"
+            android:padding="5dp"
+            android:textStyle="bold"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:background="@drawable/order_detail_info_cell_shape"
+            android:textAlignment="gravity" />
+    </TableRow>
+
+    <TableRow android:layout_marginTop="-1.8dp">
+        <TextView android:id="@+id/txtOrderDetailInfoAddress"
+            android:layout_width="0dp"
+            android:text="Đ/C: 487/3 NTT, RG, KG"
+            android:layout_weight="1"
+            android:textSize="16dp"
+            android:layout_height="wrap_content"
+            android:gravity="left|center_vertical"
+            android:padding="5dp"
+            android:textStyle="bold"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:background="@drawable/order_detail_info_cell_shape"
+            android:textAlignment="gravity" />
+    </TableRow>
+
+
+    <TableRow android:layout_marginTop="20dp">
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Giao hàng"
+            android:layout_weight="1"
+            android:id="@+id/btnCompleted" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Báo trễ"
+            android:layout_weight="1"
+            android:id="@+id/btnReport" />
+    </TableRow>
 
 </TableLayout>
