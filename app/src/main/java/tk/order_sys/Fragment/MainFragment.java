@@ -118,4 +118,8 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
             }
         }, 2000);
     }
+
+    public static interface LogoutInterface{
+        public void onLogoutSuccess();
+    }
 }

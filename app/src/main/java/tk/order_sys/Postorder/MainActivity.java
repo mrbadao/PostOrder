@@ -12,7 +12,7 @@ import tk.order_sys.Fragment.LoginFragment;
 import tk.order_sys.Fragment.MainFragment;
 
 
-public class MainActivity extends ActionBarActivity implements LoginFragment.LoginInterface {
+public class MainActivity extends ActionBarActivity implements LoginFragment.LoginInterface, MainFragment.LogoutInterface {
     FragmentManager fragmentManager;
 
     @Override
@@ -50,9 +50,13 @@ public class MainActivity extends ActionBarActivity implements LoginFragment.Log
                 Intent intentOrdersMap = new Intent(getApplicationContext(), OrdersMapActivity.class);
                 startActivity(intentOrdersMap);
                 return true;
+
             case R.id.action_settings:
                 Intent intentSettings =  new Intent(getApplicationContext(), SettingsActivity.class);
                 startActivity(intentSettings);
+                return true;
+            case R.id.action_logout:
+                onLogoutSuccess();
                 return true;
         }
 
@@ -64,11 +68,19 @@ public class MainActivity extends ActionBarActivity implements LoginFragment.Log
         fragmentManager.beginTransaction()
                 .replace(R.id.container, new MainFragment())
                 .commit();
-        getSupportActionBar().show();
     }
 
     public void onShowHideActionBar(boolean flag){
         if (flag) getSupportActionBar().show();
-        else getSupportActionBar().hide();
+        else {
+            getSupportActionBar().hide();
+        }
+    }
+
+    @Override
+    public void onLogoutSuccess() {
+        fragmentManager.beginTransaction()
+                .replace(R.id.container, new LoginFragment())
+                .commit();
     }
 }
