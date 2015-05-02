@@ -5,7 +5,12 @@
         android:title="@string/action_settings"
         android:icon="@drawable/ic_action_settings"
         android:orderInCategory="100"
-        app:showAsAction="collapseActionView" />
+        app:showAsAction="never" />
+
+    <item android:id="@+id/action_logout"
+        android:title="@string/action_logout"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
 
     <item android:id="@+id/action_map"
         android:icon="@drawable/ic_action_map"

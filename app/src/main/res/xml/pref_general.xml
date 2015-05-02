@@ -1,0 +1,43 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="Cài đặt GPS">
+
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/settings_MIN_TIME_BW_UPDATES_list_titles"
+            android:entryValues="@array/settings_MIN_TIME_BW_UPDATES_list_values"
+            android:key="tk.order_sys.postorder.settings.MIN_TIME_BW_UPDATES"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:title="@string/settings_MIN_TIME_BW_UPDATES" />
+
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/settings_MIN_DISTANCE_CHANGE_FOR_UPDATE_list_titles"
+            android:entryValues="@array/settings_MIN_DISTANCE_CHANGE_FOR_UPDATE_list_values"
+            android:key="tk.order_sys.postorder.settings.MIN_DISTANCE_CHANGE_FOR_UPDATE"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:title="@string/settings_MIN_DISTANCE_CHANGE_FOR_UPDATE" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Cài đặt SMS">
+        <CheckBoxPreference
+            android:key="tk.order_sys.postorder.settings.SEND_NOTICE_SMS"
+            android:title="@string/settings_SEND_NOTICE_SMS_title"
+            android:defaultValue="true" />
+
+        <ListPreference
+            android:defaultValue="1000"
+            android:dependency="tk.order_sys.postorder.settings.SEND_NOTICE_SMS"
+            android:entries="@array/settings_SEND_NOTICE_SMS_list_titles"
+            android:entryValues="@array/settings_SEND_NOTICE_SMS_list_values"
+            android:key="tk.order_sys.postorder.settings.SEND_NOTICE_SMS_DISTANCE"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:title="@string/settings_SEND_NOTICE_SMS_DISTANCE_title" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

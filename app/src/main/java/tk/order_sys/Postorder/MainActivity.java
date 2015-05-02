@@ -50,6 +50,10 @@ public class MainActivity extends ActionBarActivity implements LoginFragment.Log
                 Intent intentOrdersMap = new Intent(getApplicationContext(), OrdersMapActivity.class);
                 startActivity(intentOrdersMap);
                 return true;
+            case R.id.action_settings:
+                Intent intentSettings =  new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(intentSettings);
+                return true;
         }
 
         return super.onOptionsItemSelected(item);

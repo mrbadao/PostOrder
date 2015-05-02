@@ -72,6 +72,10 @@ public class OrderDetailActivity extends ActionBarActivity implements ActionBar.
                 Intent intentOrdersMap = new Intent(OrderDetailActivity.this, OrdersMapActivity.class);
                 startActivityForResult(intentOrdersMap, ORDERS_MAPS_ACTIVITY_CODE);
                 return true;
+            case R.id.action_settings:
+                Intent intentSettings =  new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(intentSettings);
+                return true;
         }
 
         return super.onOptionsItemSelected(item);

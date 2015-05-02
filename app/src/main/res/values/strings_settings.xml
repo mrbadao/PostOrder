@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_activity_settings">Cài đặt</string>
+
+    <!--tk.order_sys.postorder.settings.MIN_TIME_BW_UPDATES"-->
+    <string name="settings_MIN_TIME_BW_UPDATES">Thời gian update vị trí</string>
+
+    <string-array name="settings_MIN_TIME_BW_UPDATES_list_titles">
+        <item>1 phút</item>
+        <item>3 phút</item>
+        <item>5 phút</item>
+    </string-array>
+
+    <string-array name="settings_MIN_TIME_BW_UPDATES_list_values">
+        <item>1</item>
+        <item>3</item>
+        <item>5</item>
+    </string-array>
+
+    <!--tk.order_sys.postorder.settings.MMIN_DISTANCE_CHANGE_FOR_UPDATE"-->
+    <string name="settings_MIN_DISTANCE_CHANGE_FOR_UPDATE">Khoảng cách update vị trí</string>
+
+    <string-array name="settings_MIN_DISTANCE_CHANGE_FOR_UPDATE_list_titles">
+        <item>0</item>
+        <item>5 m</item>
+        <item>10 m</item>
+        <item>50 m</item>
+    </string-array>
+
+    <string-array name="settings_MIN_DISTANCE_CHANGE_FOR_UPDATE_list_values">
+        <item>0</item>
+        <item>5</item>
+        <item>10</item>
+        <item>50</item>
+    </string-array>
+
+    <!--tk.order_sys.postorder.settings.SEND_NOTICE_SMS-->
+    <string name="settings_SEND_NOTICE_SMS_title">Gửi sms thông báo nhận hàng</string>
+    <string name="settings_SEND_NOTICE_SMS_DISTANCE_title">Khoảng cách gữi sms</string>
+
+    <string-array name="settings_SEND_NOTICE_SMS_list_titles">
+        <item>500 km</item>
+        <item>1 km</item>
+        <item>2 km</item>
+    </string-array>
+
+    <string-array name="settings_SEND_NOTICE_SMS_list_values">
+        <item>500</item>
+        <item>1000</item>
+        <item>2000</item>
+    </string-array>
+
+</resources>

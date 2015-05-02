@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">PostOrder</string>
     <string name="action_settings">Cài đặt</string>
+    <string name="action_logout">Đăng xuất</string>
     <string name="action_map">Bản đồ</string>
     <string name="title_activity_orders_map">Bản đồ đơn hàng</string>
     <string name="title_activity_order_detail">Chi tiết</string>
