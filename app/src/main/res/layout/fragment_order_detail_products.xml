@@ -1,13 +1,128 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="tk.order_sys.Postorder.OrderDetailActivity">
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    <TableLayout
+        tools:context="tk.order_sys.Postorder.OrderDetailActivity"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:stretchColumns="3"
+        android:id="@+id/tableLayoutOrderDetailInfo"
+        android:paddingLeft="2dp"
+        android:paddingTop="30dp"
+        android:paddingRight="2dp"
+        android:paddingBottom="10dp">
 
-    <TextView android:id="@+id/section_label" android:layout_width="wrap_content"
-        android:text="Products"
-        android:layout_height="wrap_content" />
+        <TableRow>
+            <TextView
+                android:layout_width="0dp"
+                android:text="Tên sp"
+                android:textSize="16dp"
+                android:textStyle="bold"
+                android:layout_weight="2.5"
+                android:layout_height="wrap_content"
+                android:textAlignment="gravity"
+                android:gravity="left|center_vertical"
+                android:layout_gravity="center_vertical"
+                android:padding="5dp"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:background="@drawable/order_detail_products_cell_header_shape"
+                />
 
-</RelativeLayout>
+            <TextView
+                android:layout_width="0dp"
+                android:textStyle="bold"
+                android:text="SL"
+                android:layout_weight="0.5"
+                android:textSize="16dp"
+                android:layout_height="wrap_content"
+                android:gravity="center|center_vertical"
+                android:padding="5dp"
+                android:layout_marginLeft="-1.8dp"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:background="@drawable/order_detail_products_cell_header_shape"
+                android:textAlignment="gravity" />
+
+            <TextView
+                android:id="@+id/txtOrderDetailProductTotal"
+                android:layout_width="0dp"
+                android:textStyle="bold"
+                android:text="Giá"
+                android:layout_weight="2"
+                android:textSize="16dp"
+                android:layout_height="wrap_content"
+                android:gravity="center|center_vertical"
+                android:padding="5dp"
+                android:layout_marginLeft="-1.8dp"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:background="@drawable/order_detail_products_cell_header_shape"
+                android:textAlignment="gravity" />
+        </TableRow>
+
+        <TableRow android:layout_marginTop="-1.8dp">
+            <TextView
+                android:id="@+id/txtOrderDetailProductName"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:layout_width="0dp"
+                android:text="Cơm dương châu"
+                android:layout_weight="2.5"
+                android:layout_height="wrap_content"
+                android:textAlignment="gravity"
+                android:gravity="left|center_vertical"
+                android:layout_gravity="center_vertical"
+                android:padding="5dp"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:background="@drawable/order_detail_products_cell_header_shape"
+                />
+
+            <TextView
+                android:id="@+id/txtOrderDetailProductQty"
+                android:layout_width="0dp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:text="3"
+                android:layout_weight="0.5"
+                android:layout_height="wrap_content"
+                android:gravity="center|center_vertical"
+                android:padding="5dp"
+                android:layout_marginLeft="-1.8dp"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:background="@drawable/order_detail_products_cell_header_shape"
+                android:textAlignment="gravity" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:text="150.000"
+                android:layout_weight="2"
+                android:layout_height="wrap_content"
+                android:gravity="right|center_vertical"
+                android:padding="5dp"
+                android:layout_marginLeft="-1.8dp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:background="@drawable/order_detail_products_cell_header_shape"
+                android:textAlignment="gravity" />
+        </TableRow>
+
+        <TableRow android:layout_marginTop="-1.8dp">
+        <TextView
+            android:layout_width="0dp"
+            android:text="150.000 đ"
+            android:layout_weight="2.5"
+            android:layout_height="wrap_content"
+            android:textAlignment="gravity"
+            android:gravity="right|center_vertical"
+            android:layout_gravity="center_vertical"
+            android:padding="5dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:background="@drawable/order_detail_products_cell_header_shape"
+            />
+        </TableRow>
+
+
+
+    </TableLayout>
+</ScrollView>
