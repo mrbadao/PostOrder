@@ -20,6 +20,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
 
 import tk.order_sys.Postorder.OrdersMapActivity;
+import tk.order_sys.config.Constants;
 
 /**
  * Created by mrbadao on 30/04/2015.
@@ -32,16 +33,19 @@ public class OrderTracingService extends Service implements LocationListener, Ro
     public static final String DATA_LAST_ORDER_LOCATION = "OrderTracingService.data.mLastOrderLocation";
     public static final String DATA_ROUTING_FAILED = "OrderTracingService.data.mRoutingFailed";
 
-    private static String CURRENT_LOCATION_TAG = "mCurrentLocation";
-
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATE = 0;
-    private static final long MIN_TIME_BW_UPDATES = 1000 * 10 * 1;
+    private static String PREF_CURRENT_LOCATION_TAG = "mCurrentLocation";
 
     private LocationManager locationManager;
     private String mProvider;
     private LatLng mCurrentLocation;
     private LatLng mLastOrderLocation;
     private Routing.TravelMode mTravelMode;
+
+    private long mGpsUpdateMinDistance;
+    private long mGpsUpdateMinTime;
+
+    private boolean isSendNoticeSms;
+    private long distanceSendNoticeSms;
 
     @Override
     public void onCreate() {
@@ -58,33 +62,35 @@ public class OrderTracingService extends Service implements LocationListener, Ro
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        loadAppSetting();
         String intentAction = intent.getAction();
 
-//      Get Lastorder location
-        if(intent.hasExtra(OrdersMapActivity.ORDER_TRACING_SERVICE_PARAM_LAST_ORDER_LOCATION)){
-            Gson gson = new Gson();
-            mLastOrderLocation = gson.fromJson(intent.getStringExtra(OrdersMapActivity.ORDER_TRACING_SERVICE_PARAM_LAST_ORDER_LOCATION), LatLng.class);
-        }
-//        Toast.makeText(getApplicationContext(), intentAction, Toast.LENGTH_SHORT).show();
-        // Setup locationManager
-        locationManager.requestLocationUpdates(mProvider, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATE, this);
-        Location location = locationManager.getLastKnownLocation(mProvider);
+        if(intentAction.equals(OrdersMapActivity.ORDER_TRACING_SERVICE_ACTION_GET_ROUTING)) {
+//          Get Lastorder location
+            if (intent.hasExtra(OrdersMapActivity.ORDER_TRACING_SERVICE_PARAM_LAST_ORDER_LOCATION)) {
+                Gson gson = new Gson();
+                mLastOrderLocation = gson.fromJson(intent.getStringExtra(OrdersMapActivity.ORDER_TRACING_SERVICE_PARAM_LAST_ORDER_LOCATION), LatLng.class);
+            }
+//          Toast.makeText(getApplicationContext(), intentAction, Toast.LENGTH_SHORT).show();
+            // Setup locationManager
+            locationManager.requestLocationUpdates(mProvider, mGpsUpdateMinTime, mGpsUpdateMinDistance, this);
+            Location location = locationManager.getLastKnownLocation(mProvider);
 
-        //get Current Location
-        if(location != null){
-            mCurrentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-        }else {
-            mCurrentLocation = loadSavedLocation();
-        }
-
-        if (mCurrentLocation != null){
-            if (mLastOrderLocation != null) {
-                getRouting(mCurrentLocation, mLastOrderLocation, mTravelMode);
+            //get Current Location
+            if (location != null) {
+                mCurrentLocation = new LatLng(location.getLatitude(), location.getLongitude());
             } else {
-                reportLocation();
+                mCurrentLocation = loadSavedLocation();
+            }
+
+            if (mCurrentLocation != null) {
+                if (mLastOrderLocation != null) {
+                    getRouting(mCurrentLocation, mLastOrderLocation, mTravelMode);
+                } else {
+                    reportLocation();
+                }
             }
         }
-
         return START_STICKY;
     }
 
@@ -119,14 +125,14 @@ public class OrderTracingService extends Service implements LocationListener, Ro
     public void onProviderEnabled(String provider) {
         Criteria criteria = new Criteria();
         mProvider = locationManager.getBestProvider(criteria, true);
-        locationManager.requestLocationUpdates(mProvider, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATE, this);
+        locationManager.requestLocationUpdates(mProvider, mGpsUpdateMinTime, mGpsUpdateMinDistance, this);
     }
 
     @Override
     public void onProviderDisabled(String provider) {
         Criteria criteria = new Criteria();
         mProvider = locationManager.getBestProvider(criteria, true);
-        locationManager.requestLocationUpdates(mProvider, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATE, this);
+        locationManager.requestLocationUpdates(mProvider, mGpsUpdateMinTime, mGpsUpdateMinDistance, this);
     }
 
     private void reportLocation(){
@@ -143,8 +149,8 @@ public class OrderTracingService extends Service implements LocationListener, Ro
         Gson gson = new Gson();
         LatLng latLng = null;
 
-        if (mSharedPreferences.contains(CURRENT_LOCATION_TAG)) {
-            String jsonCurrentLocation = mSharedPreferences.getString(CURRENT_LOCATION_TAG, null);
+        if (mSharedPreferences.contains(PREF_CURRENT_LOCATION_TAG)) {
+            String jsonCurrentLocation = mSharedPreferences.getString(PREF_CURRENT_LOCATION_TAG, null);
             latLng = gson.fromJson(jsonCurrentLocation, LatLng.class);
         }
         return latLng;
@@ -189,6 +195,26 @@ public class OrderTracingService extends Service implements LocationListener, Ro
             Routing mRouting = new Routing(travelMode);
             mRouting.registerListener(this);
             mRouting.execute(fromLatLng, toLatLng);
+        }
+    }
+
+    private void loadAppSetting(){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        if (sharedPreferences.contains(Constants.SETTING_GPS_UPDATE_DISTANCE)){
+            mGpsUpdateMinDistance = Long.parseLong(sharedPreferences.getString(Constants.SETTING_GPS_UPDATE_DISTANCE, "0"));
+        }
+
+        if (sharedPreferences.contains(Constants.SETTING_GPS_UPDATE_MIN_TIME)){
+            mGpsUpdateMinTime = 1000 * 10 * Long.parseLong(sharedPreferences.getString(Constants.SETTING_GPS_UPDATE_MIN_TIME, "1"));
+        }
+
+        if (sharedPreferences.contains(Constants.SETTING_SMS_SEND_FLAG)){
+            isSendNoticeSms = sharedPreferences.getBoolean(Constants.SETTING_SMS_SEND_FLAG, true);
+        }
+
+        if (sharedPreferences.contains(Constants.SETTING_SMS_SEND_DISTANCE)){
+            distanceSendNoticeSms = Long.parseLong(sharedPreferences.getString(Constants.SETTING_SMS_SEND_DISTANCE, "1000"));
         }
     }
 }

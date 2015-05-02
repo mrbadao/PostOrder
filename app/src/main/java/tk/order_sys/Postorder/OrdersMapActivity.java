@@ -160,7 +160,6 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
     private void addOrderMarkers() {
 
         if (mOrderMarkersArrayList.size() > 0) {
-            Log.i("Maker", "restore");
             return;
         }
 
