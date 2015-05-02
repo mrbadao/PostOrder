@@ -34,7 +34,6 @@ public class SettingsActivity extends ActionBarActivity {
             addPreferencesFromResource(R.xml.pref_general);
             bindPreferenceSummaryToValue(findPreference("tk.order_sys.postorder.settings.MIN_DISTANCE_CHANGE_FOR_UPDATE"));
             bindPreferenceSummaryToValue(findPreference("tk.order_sys.postorder.settings.MIN_TIME_BW_UPDATES"));
-//            bindPreferenceSummaryToValue(findPreference("tk.order_sys.postorder.settings.SEND_NOTICE_SMS"));
             bindPreferenceSummaryToValue(findPreference("tk.order_sys.postorder.settings.SEND_NOTICE_SMS_DISTANCE"));
         }
 
