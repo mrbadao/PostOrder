@@ -1,7 +1,9 @@
 package tk.order_sys.Postorder;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
@@ -14,20 +16,28 @@ import tk.order_sys.Fragment.MainFragment;
 
 public class MainActivity extends ActionBarActivity implements LoginFragment.LoginInterface, MainFragment.LogoutInterface {
     FragmentManager fragmentManager;
+    SharedPreferences mSharedPreferences = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        check login here
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setIcon(R.drawable.actionbar_logo);
 
         fragmentManager = getSupportFragmentManager();
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         if (savedInstanceState == null) {
-            Fragment fragment = new LoginFragment();
+            Fragment fragment = null;
+
+            if(mSharedPreferences != null && mSharedPreferences.contains(LoginFragment.PREF_STAFF_ID_TAG) && mSharedPreferences.contains(LoginFragment.PREF_STAFF_ID_TAG)) {
+                fragment = new MainFragment();
+            }else {
+                fragment = new LoginFragment();
+            }
+
             fragmentManager.beginTransaction()
                     .add(R.id.container, fragment)
                     .commit();
