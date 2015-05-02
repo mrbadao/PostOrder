@@ -1,6 +1,9 @@
 package tk.order_sys.PostOrderService;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Criteria;
@@ -10,7 +13,10 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.telephony.gsm.SmsManager;
 
 import com.directions.route.Route;
 import com.directions.route.Routing;
@@ -20,6 +26,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
 
 import tk.order_sys.Postorder.OrdersMapActivity;
+import tk.order_sys.Postorder.R;
 import tk.order_sys.config.Constants;
 
 /**
@@ -45,8 +52,9 @@ public class OrderTracingService extends Service implements LocationListener, Ro
     private long mGpsUpdateMinTime;
 
     private boolean isSendNoticeSms;
-    private long distanceSendNoticeSms;
+    private int distanceSendNoticeSms;
 
+    private int mNotifyId = 104;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -187,7 +195,10 @@ public class OrderTracingService extends Service implements LocationListener, Ro
 
             LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
         }
-//        Toast.makeText(getApplicationContext(), "Routing ok", Toast.LENGTH_SHORT).show();
+
+        if(isSendNoticeSms && distanceSendNoticeSms >= route.getLength()){
+            sendNoticeSms();
+        }
     }
 
     private void getRouting(LatLng fromLatLng, LatLng toLatLng, Routing.TravelMode travelMode) {
@@ -214,7 +225,49 @@ public class OrderTracingService extends Service implements LocationListener, Ro
         }
 
         if (sharedPreferences.contains(Constants.SETTING_SMS_SEND_DISTANCE)){
-            distanceSendNoticeSms = Long.parseLong(sharedPreferences.getString(Constants.SETTING_SMS_SEND_DISTANCE, "1000"));
+            distanceSendNoticeSms = Integer.parseInt(sharedPreferences.getString(Constants.SETTING_SMS_SEND_DISTANCE, "1000"));
+        }
+    }
+
+    private void sendNotification(String msg){
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_actionbar_ico)
+                        .setContentTitle("Delivery man")
+                        .setContentText(msg);
+
+        Intent resultIntent = new Intent(this, OrdersMapActivity.class);
+
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+
+        stackBuilder.addParentStack(OrdersMapActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        mNotificationManager.notify(mNotifyId, mBuilder.build());
+    }
+
+    private void sendNoticeSms(){
+        String message = "Sắp tới";
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, OrderTracingService.class), 0);
+
+        SmsManager sms = null;
+        try {
+            sms = SmsManager.getDefault();
+            sms.sendTextMessage("0929028027", null, message, pendingIntent, null);
+            sendNotification("Gỡi tin nhắn nhắc nhỡ.");
+        } catch (Exception e) {
+            sendNotification("Có lỗi trong quá trình gỡi sms.");
+            e.printStackTrace();
         }
     }
 }
