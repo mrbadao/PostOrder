@@ -5,22 +5,34 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import tk.order_sys.HttpRequest.DeliveryCompleteOrderHttpRequest;
+import tk.order_sys.HttpRequestInterface.OrderActionInterface;
 import tk.order_sys.Postorder.OrderDetailActivity;
 import tk.order_sys.Postorder.R;
 
 /**
  * Created by mrbadao on 30/04/2015.
  */
-public class OrderDetailInfoFragment extends Fragment {
+public class OrderDetailInfoFragment extends Fragment implements View.OnClickListener, OrderActionInterface{
     View rootView;
     TextView txtOrderDetailInfoCustomerName, txtOrderDetailInfoPhone, txtOrderDetailInfoCreated, txtOrderDetailInfoOrderName, txtOrderDetailInfoAddress;
+    Button btnComplete;
+
     private String orderId;
+    private String mPrefsTag;
+    private String mToken;
+    private String mStaffID;
 
     public OrderDetailInfoFragment() {
 
@@ -28,6 +40,10 @@ public class OrderDetailInfoFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mPrefsTag = null;
+        mToken = null;
+        mStaffID = null;
+
         rootView = inflater.inflate(R.layout.fragment_order_detail_info, container, false);
 
         txtOrderDetailInfoCustomerName = (TextView) rootView.findViewById(R.id.txtOrderDetailInfoCustomerName);
@@ -36,35 +52,102 @@ public class OrderDetailInfoFragment extends Fragment {
         txtOrderDetailInfoOrderName = (TextView) rootView.findViewById(R.id.txtOrderDetailInfoOrderName);
         txtOrderDetailInfoAddress = (TextView) rootView.findViewById(R.id.txtOrderDetailInfoAddress);
 
+        btnComplete = (Button) rootView.findViewById(R.id.btnCompleted);
+        btnComplete.setOnClickListener(this);
+
         orderId = null;
         orderId = ((OrderDetailActivity)getActivity()).getOrderId();
+
+        render();
 
         return rootView;
     }
 
     private void render(){
         SharedPreferences sharedPreferences= PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String PrefsTag = MainFragment.PREFS_ORDER_TAG + "." + orderId + ".";
 
-        if(sharedPreferences.contains(PrefsTag + "name")){
-            txtOrderDetailInfoOrderName.setText("MS: " +  sharedPreferences.getString(PrefsTag + "name", null));
+        mPrefsTag = MainFragment.PREFS_ORDER_TAG + "." + orderId + ".";
+        Log.i("INFO", mPrefsTag);
+
+        if(sharedPreferences.contains(LoginFragment.PREF_STAFF_ID_TAG)){
+            mToken = sharedPreferences.getString(LoginFragment.PREF_STAFF_ID_TAG, null);
         }
 
-        if(sharedPreferences.contains(PrefsTag + "customer_name")){
-            Toast.makeText(getActivity().getApplicationContext(),sharedPreferences.getString(PrefsTag + "customer_name", null),Toast.LENGTH_SHORT).show();
-            txtOrderDetailInfoCustomerName.setText(sharedPreferences.getString(PrefsTag + "customer_name", null));
+        if(sharedPreferences.contains(LoginFragment.PREF_STAFF_ID_TAG)){
+            mStaffID = sharedPreferences.getString(LoginFragment.PREF_STAFF_ID_TAG, null);
         }
 
-        if(sharedPreferences.contains(PrefsTag + "created")){
-            txtOrderDetailInfoCreated.setText(sharedPreferences.getString(PrefsTag + "created", null));
+        if(sharedPreferences.contains(mPrefsTag + "name")){
+            txtOrderDetailInfoOrderName.setText("MS: " +  sharedPreferences.getString(mPrefsTag + "name", null));
         }
 
-        if(sharedPreferences.contains(PrefsTag + "order_phone")){
-            txtOrderDetailInfoCreated.setText(sharedPreferences.getString(PrefsTag + "order_phone", null));
+        if(sharedPreferences.contains(mPrefsTag + "customer_name")){
+            txtOrderDetailInfoCustomerName.setText(sharedPreferences.getString(mPrefsTag + "customer_name", null));
+        }
+
+        if(sharedPreferences.contains(mPrefsTag + "created")){
+            txtOrderDetailInfoCreated.setText(sharedPreferences.getString(mPrefsTag + "created", null));
+        }
+
+        if(sharedPreferences.contains(mPrefsTag + "order_phone")){
+            txtOrderDetailInfoPhone.setText(sharedPreferences.getString(mPrefsTag + "order_phone", null));
         }
 
 //        if(sharedPreferences.contains(PrefsTag + "order_address")){
 //            txtOrderDetailInfoOrderName.setText("MS: " +  sharedPreferences.getString(PrefsTag + "order_address", null));
 //        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+        switch (id){
+            case R.id.btnCompleted:
+                if(mToken != null && mStaffID != null){
+                    JSONObject params = new JSONObject();
+
+                    try {
+                        params.put("token",mToken);
+                        params.put("staff_id",mStaffID);
+                        params.put("order_id",orderId);
+
+                        new DeliveryCompleteOrderHttpRequest(getActivity(), null, this).execute(params);
+
+                    }catch (JSONException e){
+                        e.printStackTrace();
+                    }
+                }
+
+                break;
+        }
+    }
+
+    @Override
+    public void onCompleteOrder(JSONObject jsonObject) {
+        SharedPreferences sharedPreferences= PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        if(sharedPreferences.contains(mPrefsTag + "name")){
+            editor.remove(mPrefsTag + "name");
+        }
+
+        if(sharedPreferences.contains(mPrefsTag + "customer_name")){
+            editor.remove(mPrefsTag + "customer_name");
+        }
+
+        if(sharedPreferences.contains(mPrefsTag + "created")){
+            editor.remove(mPrefsTag + "created");
+        }
+
+        if(sharedPreferences.contains(mPrefsTag + "order_phone")){
+            editor.remove(mPrefsTag + "order_phone");
+        }
+
+        editor.commit();
+
+        Toast.makeText(getActivity(), jsonObject.toString(), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getActivity(), "?ã giao thành công ??n hàng:\n" + txtOrderDetailInfoOrderName.getText(), Toast.LENGTH_SHORT).show();
+
+//        getActivity().finish();
     }
 }

@@ -183,10 +183,13 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
                     JSONObject jsonOrder = null;
                     Log.i("Count", String.valueOf(jsonOrders.length()));
 
+                    ContentOrder item = null;
+                    String PrefsTag = null;
+
                     for (int i = 0; i < jsonOrders.length(); i++){
                         jsonOrder = jsonOrders.getJSONObject(i);
 
-                        ContentOrder item = new ContentOrder(
+                         item = new ContentOrder(
                                 jsonOrder.getString("id"),
                                 jsonOrder.getString("name"),
                                 jsonOrder.getString("customer_name"),
@@ -198,9 +201,11 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
                                 jsonOrder.getString("created"),
                                 jsonOrder.getString("completed")
                         );
+                            Log.i("Item:", item.toString());
 
-//                        if(!sharedPreferences.contains(PREFS_ORDER_TAG + "." + item.id)){
-                            String PrefsTag = PREFS_ORDER_TAG + "." + item.id + ".";
+                        if(!sharedPreferences.contains(PREFS_ORDER_TAG + "." + item.id)){
+                            PrefsTag = PREFS_ORDER_TAG + "." + item.id + ".";
+                            Log.i("Item SP:", PrefsTag);
 
                             editor.putString(PrefsTag + "name",item.name);
                             editor.putString(PrefsTag + "customer_name",item.customer_name);
@@ -209,13 +214,14 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
                             editor.putString(PrefsTag + "coordinate_long",item.coordinate_long);
                             editor.putString(PrefsTag + "delivery_id",item.delivery_id);
                             editor.putString(PrefsTag + "status",item.status);
-                            editor.putString(PrefsTag + "created",item.created);
-                            editor.putString(PrefsTag + "completed",item.completed);
-                            editor.commit();
-//                        }
+                            editor.putString(PrefsTag + "created", item.created);
+
+                        }
 
                         listOrders.add(item);
                     }
+
+                    editor.commit();
 
                     if(listOrders.size() > 0){
                         if (isFirstLoad) {
