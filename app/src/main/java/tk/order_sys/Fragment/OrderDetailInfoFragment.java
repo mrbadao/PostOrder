@@ -161,6 +161,10 @@ public class OrderDetailInfoFragment extends Fragment implements View.OnClickLis
                             editor.remove(mPrefsTag + "order_phone");
                         }
 
+                        if (sharedPreferences.contains(mPrefsTag + "detail")) {
+                            editor.remove(mPrefsTag + "detail");
+                        }
+
                         editor.commit();
 
                         Toast.makeText(getActivity(), "Đã giao thành công đơn hàng:\n" + txtOrderDetailInfoOrderName.getText(), Toast.LENGTH_SHORT).show();

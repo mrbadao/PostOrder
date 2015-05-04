@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<TableRow
+xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_marginTop="-1.8dp">
+        <TextView
+            android:id="@+id/txtOrderDetailProductTotal"
+            android:layout_width="0dp"
+            android:text="150.000 đ"
+            android:layout_weight="2.5"
+            android:layout_height="wrap_content"
+            android:textAlignment="gravity"
+            android:gravity="right|center_vertical"
+            android:layout_gravity="center_vertical"
+            android:padding="5dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:background="@drawable/order_detail_products_cell_header_shape"
+            />
+    </TableRow>
