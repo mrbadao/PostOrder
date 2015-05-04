@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -16,12 +17,22 @@ public class OrderDetailActivity extends ActionBarActivity implements ActionBar.
     private static final int ORDERS_MAPS_ACTIVITY_CODE = 102;
     OrderDetailSectionsPagerAdapter mSectionsPagerAdapter;
 
+    private String orderId;
+
     ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_detail);
+        orderId = null;
+
+        Intent intent = getIntent();
+
+        if(intent.hasExtra("orderId")){
+            orderId = intent.getStringExtra("orderId");
+            Log.i("orderId", orderId);
+        }
 
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
@@ -94,4 +105,7 @@ public class OrderDetailActivity extends ActionBarActivity implements ActionBar.
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
+    public String getOrderId(){
+        return orderId;
+    }
 }

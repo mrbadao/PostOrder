@@ -31,7 +31,7 @@ public abstract class AbstractRouting<T> extends AsyncTask<T, Void, Route> {
 
         protected String _sValue;
 
-        private TravelMode(String sValue) {
+        TravelMode(String sValue) {
             this._sValue = sValue;
         }
 

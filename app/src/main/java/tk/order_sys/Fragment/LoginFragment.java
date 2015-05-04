@@ -108,7 +108,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Del
         }
     }
 
-    public static interface LoginInterface{
-        public void onLoginSuccess();
+    public interface LoginInterface{
+        void onLoginSuccess();
     }
 }

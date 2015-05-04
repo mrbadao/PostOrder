@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import tk.order_sys.Postorder.OrderDetailActivity;
 import tk.order_sys.Postorder.R;
 
 /**
@@ -22,6 +23,7 @@ public class OrderDetailProductsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_order_detail_products, container, false);
+        ((OrderDetailActivity)getActivity()).getOrderId();
         return rootView;
     }
 }

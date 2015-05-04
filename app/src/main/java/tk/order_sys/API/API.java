@@ -38,7 +38,7 @@ public class API {
     static final String SECRET_KEY = "6dn9T3t2760yypWAhdhURmz7oZQrhdXjqRoTorybjWU=";
 
     static final String API_DELIVERY_LOGIN = "delivery/login";
-    static final String API_PRODUCTS_SEARCH = "product/search";
+    static final String API_DELIVERY_GET_ORDERS = "delivery/GetDeliveryOrders";
     static final String API_PRODUCTS_HOT = "product/gethot";
     static final String API_CART_ADD_ITEM = "cart/add";
     static final String API_CART_GET_ITEM = "cart/getcart";
@@ -232,6 +232,10 @@ public class API {
 
     public static JSONObject DeliveryLogin(JSONObject params, JSONArray jsonCookieStore) {
         return getJSON(appConfig.getApiUrl(true) + API_DELIVERY_LOGIN, params, jsonCookieStore);
+    }
+
+    public static JSONObject getDeliveryOrders(JSONObject params, JSONArray jsonCookieStore) {
+        return getJSON(appConfig.getApiUrl(true) + API_DELIVERY_GET_ORDERS, params, jsonCookieStore);
     }
 
 }
