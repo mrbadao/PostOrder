@@ -26,6 +26,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import tk.order_sys.PostOrderBroadcastReceiver.LocationReceiver;
 import tk.order_sys.PostOrderInterface.LocationReceiverInterface;
@@ -158,33 +159,60 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
     }
 
     private void addOrderMarkers() {
+        String key = null;
+        String tilte = null;
+//        Double lat, lng;
+        Map<String,?> mapOrders =  mSharedPreferences.getAll();
 
-        if (mOrderMarkersArrayList.size() > 0) {
-            return;
+        for (Map.Entry<String, ?> entry : mapOrders.entrySet()) {
+            key = entry.getKey();
+            if(key.matches("tk.order_sys.postorder.order.[0-9]*.name")) {
+                key= key.substring(0, entry.getKey().length() - 4);
+                tilte = entry.getValue().toString();
+                Log.i("map",mapOrders.get(key + "coordinate_lat").toString());
+
+                if(mapOrders.containsKey(key + "coordinate_lat") && mapOrders.containsKey(key + "coordinate_long")){
+                    Double lat = Double.parseDouble(mapOrders.get(key + "coordinate_lat").toString());
+                    Double lng = Double.parseDouble(mapOrders.get(key + "coordinate_long").toString());
+
+                    MarkerOptions markerOptions = new MarkerOptions();
+                    markerOptions.position( new LatLng(lat, lng));
+                    markerOptions.title(tilte);
+                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+
+
+                    mOrderMarkersArrayList.add(mMap.addMarker(markerOptions));
+                }
+            }
         }
 
-        Log.i("Maker", "new");
 
-        mOrderMarkersArrayList.add(mMap.addMarker(
-                new MarkerOptions().position(
-                        new LatLng(10.8000952, 106.61643240000001))
-                        .title("AEONMALL Tan Phu Celadon")
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-        ));
-
-        mOrderMarkersArrayList.add(mMap.addMarker(new MarkerOptions().position(
-                        new LatLng(10.8124513, 106.67860859999996))
-                        .title("Big C Gò Vấp")
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-        ));
-
-        mOrderMarkersArrayList.add(mMap.addMarker(new MarkerOptions().position(
-                        new LatLng(10.801811572755648, 106.64007067680359))
-                        .title("Etown")
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-        ));
-
-        mMap.setOnMarkerClickListener(this);
+//        if (mOrderMarkersArrayList.size() > 0) {
+//            return;
+//        }
+//
+//        Log.i("Maker", "new");
+//
+//        mOrderMarkersArrayList.add(mMap.addMarker(
+//                new MarkerOptions().position(
+//                        new LatLng(10.8000952, 106.61643240000001))
+//                        .title("AEONMALL Tan Phu Celadon")
+//                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+//        ));
+//
+//        mOrderMarkersArrayList.add(mMap.addMarker(new MarkerOptions().position(
+//                        new LatLng(10.8124513, 106.67860859999996))
+//                        .title("Big C Gò Vấp")
+//                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+//        ));
+//
+//        mOrderMarkersArrayList.add(mMap.addMarker(new MarkerOptions().position(
+//                        new LatLng(10.801811572755648, 106.64007067680359))
+//                        .title("Etown")
+//                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+//        ));
+//
+//        mMap.setOnMarkerClickListener(this);
     }
 
 
