@@ -1,6 +1,8 @@
 package tk.order_sys.Fragment;
 
 
+import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -25,6 +27,8 @@ import tk.order_sys.Postorder.R;
  * Created by mrbadao on 30/04/2015.
  */
 public class OrderDetailInfoFragment extends Fragment implements View.OnClickListener, OrderActionInterface{
+    public static final String CALL_BACK_ORDER_COMPLETED_FLAG = "oderCompleted";
+
     View rootView;
     TextView txtOrderDetailInfoCustomerName, txtOrderDetailInfoPhone, txtOrderDetailInfoCreated, txtOrderDetailInfoOrderName, txtOrderDetailInfoAddress;
     Button btnComplete;
@@ -69,8 +73,8 @@ public class OrderDetailInfoFragment extends Fragment implements View.OnClickLis
         mPrefsTag = MainFragment.PREFS_ORDER_TAG + "." + orderId + ".";
         Log.i("INFO", mPrefsTag);
 
-        if(sharedPreferences.contains(LoginFragment.PREF_STAFF_ID_TAG)){
-            mToken = sharedPreferences.getString(LoginFragment.PREF_STAFF_ID_TAG, null);
+        if(sharedPreferences.contains(LoginFragment.PREF_STAFF_TOKEN_TAG)){
+            mToken = sharedPreferences.getString(LoginFragment.PREF_STAFF_TOKEN_TAG, null);
         }
 
         if(sharedPreferences.contains(LoginFragment.PREF_STAFF_ID_TAG)){
@@ -124,30 +128,51 @@ public class OrderDetailInfoFragment extends Fragment implements View.OnClickLis
 
     @Override
     public void onCompleteOrder(JSONObject jsonObject) {
-        SharedPreferences sharedPreferences= PreferenceManager.getDefaultSharedPreferences(getActivity());
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+        if(jsonObject !=null) {
+            try {
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        if(sharedPreferences.contains(mPrefsTag + "name")){
-            editor.remove(mPrefsTag + "name");
+                if (!jsonObject.isNull("error")) {
+                    int errorCode = jsonObject.getJSONObject("error").getInt("error_code");
+
+                    if(errorCode == 1015){
+
+                    }
+                }
+
+                if(!jsonObject.isNull("status")){
+                    int statusCode = jsonObject.getJSONObject("status").getInt("status_code");
+
+                    if(statusCode == 1016){
+                        if (sharedPreferences.contains(mPrefsTag + "name")) {
+                            editor.remove(mPrefsTag + "name");
+                        }
+
+                        if (sharedPreferences.contains(mPrefsTag + "customer_name")) {
+                            editor.remove(mPrefsTag + "customer_name");
+                        }
+
+                        if (sharedPreferences.contains(mPrefsTag + "created")) {
+                            editor.remove(mPrefsTag + "created");
+                        }
+
+                        if (sharedPreferences.contains(mPrefsTag + "order_phone")) {
+                            editor.remove(mPrefsTag + "order_phone");
+                        }
+
+                        editor.commit();
+
+                        Toast.makeText(getActivity(), "ƒê√£ giao th√†nh c√¥ng ƒë∆°n h√†ng:\n" + txtOrderDetailInfoOrderName.getText(), Toast.LENGTH_SHORT).show();
+
+                        Intent intentCallBackData = new Intent();
+                        intentCallBackData.putExtra(CALL_BACK_ORDER_COMPLETED_FLAG, true);
+                        getActivity().setResult(Activity.RESULT_OK, intentCallBackData);
+
+                        getActivity().finish();
+                    }
+                }
+            } catch (JSONException e) { e.printStackTrace(); }
         }
-
-        if(sharedPreferences.contains(mPrefsTag + "customer_name")){
-            editor.remove(mPrefsTag + "customer_name");
-        }
-
-        if(sharedPreferences.contains(mPrefsTag + "created")){
-            editor.remove(mPrefsTag + "created");
-        }
-
-        if(sharedPreferences.contains(mPrefsTag + "order_phone")){
-            editor.remove(mPrefsTag + "order_phone");
-        }
-
-        editor.commit();
-
-        Toast.makeText(getActivity(), jsonObject.toString(), Toast.LENGTH_SHORT).show();
-//        Toast.makeText(getActivity(), "?„ giao th‡nh cÙng ??n h‡ng:\n" + txtOrderDetailInfoOrderName.getText(), Toast.LENGTH_SHORT).show();
-
-//        getActivity().finish();
     }
 }

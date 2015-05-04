@@ -6,7 +6,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -31,7 +30,6 @@ public class OrderDetailActivity extends ActionBarActivity implements ActionBar.
 
         if(intent.hasExtra("orderId")){
             orderId = intent.getStringExtra("orderId");
-            Log.i("orderId", orderId);
         }
 
         // Set up the action bar.

@@ -7,4 +7,5 @@ import org.json.JSONObject;
  */
 public interface DeliveryInterface {
     void onUserLogin(JSONObject jsonObject);
+    void onCheckToken(JSONObject jsonObject);
 }

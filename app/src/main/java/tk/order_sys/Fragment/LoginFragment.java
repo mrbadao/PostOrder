@@ -108,6 +108,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Del
         }
     }
 
+    @Override
+    public void onCheckToken(JSONObject jsonObject) {
+        return;
+    }
+
     public interface LoginInterface{
         void onLoginSuccess();
     }

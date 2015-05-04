@@ -1,6 +1,6 @@
 package tk.order_sys.Fragment;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -8,13 +8,11 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,7 +30,6 @@ import tk.order_sys.Postorder.MainActivity;
 import tk.order_sys.Postorder.OrderDetailActivity;
 import tk.order_sys.Postorder.R;
 import tk.order_sys.XListView.view.XListView;
-import tk.order_sys.config.appConfig;
 import tk.order_sys.models.ContentOrder;
 
 /**
@@ -90,14 +87,33 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
         xListViewOrders.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intentOrderDetail = new Intent(getActivity().getApplicationContext(), OrderDetailActivity.class);
-                intentOrderDetail.putExtra("orderId", listOrders.get(position).id);
-                getActivity().startActivityForResult(intentOrderDetail,ORDERS_DETAIL_ACTIVITY_CODE);
+                String orderId = listOrders.get(position - 1).id;
+                if(orderId != null && !orderId.isEmpty()) {
+                    Intent intentOrderDetail = new Intent(getActivity().getApplicationContext(), OrderDetailActivity.class);
+                    intentOrderDetail.putExtra("orderId", orderId);
+                    startActivityForResult(intentOrderDetail, ORDERS_DETAIL_ACTIVITY_CODE);
+                }
             }
         });
 
         mHandler = new Handler();
         return rootView;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == Activity.RESULT_OK && (requestCode == ORDERS_DETAIL_ACTIVITY_CODE)) {
+            if (data.hasExtra(OrderDetailInfoFragment.CALL_BACK_ORDER_COMPLETED_FLAG)) {
+                boolean flag = data.getBooleanExtra(OrderDetailInfoFragment.CALL_BACK_ORDER_COMPLETED_FLAG, false);
+                if(flag){
+                    onRefresh();
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+
     }
 
     private void getOrders() {

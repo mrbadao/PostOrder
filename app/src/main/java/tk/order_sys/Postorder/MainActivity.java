@@ -10,11 +10,16 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import tk.order_sys.Fragment.LoginFragment;
 import tk.order_sys.Fragment.MainFragment;
+import tk.order_sys.HttpRequest.DeliveryCheckTokenHttpRequest;
+import tk.order_sys.HttpRequestInterface.DeliveryInterface;
 
 
-public class MainActivity extends ActionBarActivity implements LoginFragment.LoginInterface, MainFragment.LogoutInterface {
+public class MainActivity extends ActionBarActivity implements LoginFragment.LoginInterface, MainFragment.LogoutInterface, DeliveryInterface {
     FragmentManager fragmentManager;
     SharedPreferences mSharedPreferences = null;
 
@@ -25,22 +30,32 @@ public class MainActivity extends ActionBarActivity implements LoginFragment.Log
 
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setIcon(R.drawable.actionbar_logo);
+        getSupportActionBar().hide();
 
         fragmentManager = getSupportFragmentManager();
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         if (savedInstanceState == null) {
-            Fragment fragment = null;
 
-            if(mSharedPreferences != null && mSharedPreferences.contains(LoginFragment.PREF_STAFF_ID_TAG) && mSharedPreferences.contains(LoginFragment.PREF_STAFF_ID_TAG)) {
-                fragment = new MainFragment();
+
+            if(mSharedPreferences != null && mSharedPreferences.contains(LoginFragment.PREF_STAFF_TOKEN_TAG) && mSharedPreferences.contains(LoginFragment.PREF_STAFF_ID_TAG)) {
+                String Token = mSharedPreferences.getString(LoginFragment.PREF_STAFF_TOKEN_TAG, null);
+                String StaffID = mSharedPreferences.getString(LoginFragment.PREF_STAFF_ID_TAG, null);
+
+                JSONObject params = new JSONObject();
+                try {
+                    params.put("token",Token);
+                    params.put("staff_id",StaffID);
+
+                    new DeliveryCheckTokenHttpRequest(getApplicationContext(), null, this).execute(params);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }else {
-                fragment = new LoginFragment();
+                onCheckToken(null);
             }
 
-            fragmentManager.beginTransaction()
-                    .add(R.id.container, fragment)
-                    .commit();
+
         }
     }
 
@@ -91,6 +106,41 @@ public class MainActivity extends ActionBarActivity implements LoginFragment.Log
     public void onLogoutSuccess() {
         fragmentManager.beginTransaction()
                 .replace(R.id.container, new LoginFragment())
+                .commit();
+    }
+
+    @Override
+    public void onUserLogin(JSONObject jsonObject) {
+        return;
+    }
+
+    @Override
+    public void onCheckToken(JSONObject jsonObject) {
+        Fragment fragment = null;
+
+        if(jsonObject != null){
+            if(!jsonObject.isNull("status")){
+                int statusCode = 0;
+
+                try {
+                    statusCode = jsonObject.getJSONObject("status").getInt("status_code");
+                    if(statusCode == 1017){
+                        fragment = new MainFragment();
+                    }else fragment = new LoginFragment();
+                } catch (JSONException e) {
+                    fragment = new LoginFragment();
+                    e.printStackTrace();
+                }
+
+            }else{
+                fragment = new LoginFragment();
+            }
+        }else {
+            fragment = new LoginFragment();
+        }
+
+        fragmentManager.beginTransaction()
+                .add(R.id.container, fragment)
                 .commit();
     }
 }

@@ -40,6 +40,7 @@ public class API {
     static final String API_DELIVERY_LOGIN = "delivery/login";
     static final String API_DELIVERY_GET_ORDERS = "delivery/GetDeliveryOrders";
     static final String API_DELIVERY_COMPLETE_ORDER = "delivery/CompleteDeliveryOrder";
+    static final String API_DELIVERY_CHECK_TOKEN = "delivery/checktoken";
     // constructor
 
     public API() {
@@ -234,6 +235,10 @@ public class API {
 
     public static JSONObject completeDeliveryOrder(JSONObject params, JSONArray jsonCookieStore) {
         return getJSON(appConfig.getApiUrl(true) + API_DELIVERY_COMPLETE_ORDER, params, jsonCookieStore);
+    }
+
+    public static JSONObject checkToken(JSONObject params, JSONArray jsonCookieStore) {
+        return getJSON(appConfig.getApiUrl(true) + API_DELIVERY_CHECK_TOKEN, params, jsonCookieStore);
     }
 
 }
