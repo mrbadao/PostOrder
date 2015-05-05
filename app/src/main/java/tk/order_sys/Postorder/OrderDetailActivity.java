@@ -1,7 +1,9 @@
 package tk.order_sys.Postorder;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
@@ -9,7 +11,11 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.Gson;
+
 import tk.order_sys.Adapter.OrderDetailSectionsPagerAdapter;
+import tk.order_sys.Fragment.MainFragment;
 
 
 public class OrderDetailActivity extends ActionBarActivity implements ActionBar.TabListener {
@@ -78,9 +84,26 @@ public class OrderDetailActivity extends ActionBarActivity implements ActionBar.
 
         switch (id){
             case R.id.action_map:
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+                Gson gson = new Gson();
+                double lat = 0 , lng = 0;
+                String mPrefsTag = MainFragment.PREFS_ORDER_TAG + "." + orderId + ".";
+
+                if(sharedPreferences.contains(mPrefsTag + "coordinate_lat") && sharedPreferences.contains(mPrefsTag + "coordinate_long")){
+                    lat = Double.parseDouble(sharedPreferences.getString(mPrefsTag + "coordinate_lat","0"));
+                    lng = Double.parseDouble(sharedPreferences.getString(mPrefsTag + "coordinate_long","0"));
+                }
+
                 Intent intentOrdersMap = new Intent(OrderDetailActivity.this, OrdersMapActivity.class);
+
+                if(lat != 0 & lng !=0){
+                    LatLng latLng  = new LatLng(lat, lng);
+                    intentOrdersMap.putExtra(OrdersMapActivity.PREF_LAST_ORDER_LOCATION_TAG, gson.toJson(latLng).toString());
+                }
                 startActivityForResult(intentOrdersMap, ORDERS_MAPS_ACTIVITY_CODE);
+
                 return true;
+
             case R.id.action_settings:
                 Intent intentSettings =  new Intent(getApplicationContext(), SettingsActivity.class);
                 startActivity(intentSettings);

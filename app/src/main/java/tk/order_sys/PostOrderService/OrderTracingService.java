@@ -71,6 +71,7 @@ public class OrderTracingService extends Service implements LocationListener, Ro
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         loadAppSetting();
+
         String intentAction = intent.getAction();
 
         if(intentAction.equals(OrdersMapActivity.ORDER_TRACING_SERVICE_ACTION_GET_ROUTING)) {

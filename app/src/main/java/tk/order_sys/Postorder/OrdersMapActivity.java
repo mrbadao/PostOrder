@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.directions.route.Route;
@@ -36,13 +35,14 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
     public static String ORDER_TRACING_SERVICE_ACTION_GET_ROUTING = "OrderTracingService.action.getRouting";
     public static String ORDER_TRACING_SERVICE_PARAM_LAST_ORDER_LOCATION = "OrderTracingService.param.mLastOrderLocation";
 
-    private static String PREF_CURRENT_LOCATION_TAG = "mCurrentLocation";
+    public static String PREF_CURRENT_LOCATION_TAG = "mCurrentLocation";
+    public static String PREF_LAST_ORDER_LOCATION_TAG = "mLastOrderLocation";
 
     private static int MAP_ZOOM_DEFAULT = 12;
     private static int MAP_MY_LOCATION_ZOOM_DEFAULT = 15;
 
 
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private GoogleMap mMap;
     private TextView txtStatus;
     private ArrayList<Marker> mOrderMarkersArrayList;
     private String mCurrenOrederMarkerIndex;
@@ -72,6 +72,16 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mCurrentLocationReceiver = new LocationReceiver(this);
 
+        Intent intent = getIntent();
+
+        if(intent.hasExtra(PREF_LAST_ORDER_LOCATION_TAG)){
+            String jsonLastOrderLocation = intent.getStringExtra(PREF_LAST_ORDER_LOCATION_TAG);
+            if(!jsonLastOrderLocation.isEmpty()){
+                Gson gson = new Gson();
+                mLastOrderLocation = gson.fromJson(jsonLastOrderLocation, LatLng.class);
+            }
+        }
+
         IntentFilter mLocationIntentFilter = new IntentFilter(OrderTracingService.BROADCAST_ACTION);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mCurrentLocationReceiver, mLocationIntentFilter);
@@ -91,6 +101,18 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
         super.onPause();
     }
 
+    @Override
+    protected void onDestroy() {
+        saveData();
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onStop() {
+        saveData();
+        super.onStop();
+    }
+
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
@@ -103,12 +125,10 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
                 Intent mOrderTracingService = new Intent(OrdersMapActivity.this, OrderTracingService.class);
                 mOrderTracingService.setAction(ORDER_TRACING_SERVICE_ACTION_GET_ROUTING);
 
-                if (mSharedPreferences != null) {
+                if (mLastOrderLocation != null) {
                     Gson gson = new Gson();
-                    if (mSharedPreferences.contains(LAST_ORDER_LOCATION_TAG)) {
-                        String jsonLastOrderLocation = mSharedPreferences.getString(LAST_ORDER_LOCATION_TAG, null);
-                        mOrderTracingService.putExtra(ORDER_TRACING_SERVICE_PARAM_LAST_ORDER_LOCATION, jsonLastOrderLocation);
-                    }
+                    String jsonLastOrderLocation = gson.toJson(mLastOrderLocation);
+                    mOrderTracingService.putExtra(ORDER_TRACING_SERVICE_PARAM_LAST_ORDER_LOCATION, jsonLastOrderLocation);
                 }
 
                 startService(mOrderTracingService);
@@ -161,58 +181,37 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
     private void addOrderMarkers() {
         String key = null;
         String tilte = null;
-//        Double lat, lng;
+        mOrderMarkersArrayList.clear();
+
         Map<String,?> mapOrders =  mSharedPreferences.getAll();
 
         for (Map.Entry<String, ?> entry : mapOrders.entrySet()) {
             key = entry.getKey();
             if(key.matches("tk.order_sys.postorder.order.[0-9]*.name")) {
                 key= key.substring(0, entry.getKey().length() - 4);
+
                 tilte = entry.getValue().toString();
-                Log.i("map",mapOrders.get(key + "coordinate_lat").toString());
 
                 if(mapOrders.containsKey(key + "coordinate_lat") && mapOrders.containsKey(key + "coordinate_long")){
                     Double lat = Double.parseDouble(mapOrders.get(key + "coordinate_lat").toString());
                     Double lng = Double.parseDouble(mapOrders.get(key + "coordinate_long").toString());
 
                     MarkerOptions markerOptions = new MarkerOptions();
-                    markerOptions.position( new LatLng(lat, lng));
+                    markerOptions.position(new LatLng(lat, lng));
                     markerOptions.title(tilte);
-                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
 
+                    if(mLastOrderLocation != null && mLastOrderLocation.latitude == lat && mLastOrderLocation.longitude == lng){
+                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                    }else {
+                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                    }
 
                     mOrderMarkersArrayList.add(mMap.addMarker(markerOptions));
                 }
             }
         }
 
-
-//        if (mOrderMarkersArrayList.size() > 0) {
-//            return;
-//        }
-//
-//        Log.i("Maker", "new");
-//
-//        mOrderMarkersArrayList.add(mMap.addMarker(
-//                new MarkerOptions().position(
-//                        new LatLng(10.8000952, 106.61643240000001))
-//                        .title("AEONMALL Tan Phu Celadon")
-//                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-//        ));
-//
-//        mOrderMarkersArrayList.add(mMap.addMarker(new MarkerOptions().position(
-//                        new LatLng(10.8124513, 106.67860859999996))
-//                        .title("Big C Gò Vấp")
-//                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-//        ));
-//
-//        mOrderMarkersArrayList.add(mMap.addMarker(new MarkerOptions().position(
-//                        new LatLng(10.801811572755648, 106.64007067680359))
-//                        .title("Etown")
-//                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-//        ));
-//
-//        mMap.setOnMarkerClickListener(this);
+        mMap.setOnMarkerClickListener(this);
     }
 
 
@@ -239,8 +238,7 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
         if (mSharedPreferences == null) return;
 
         Gson gson = new Gson();
-
-        if (mSharedPreferences.contains(LAST_ORDER_LOCATION_TAG)) {
+        if (mSharedPreferences.contains(LAST_ORDER_LOCATION_TAG) && mLastOrderLocation == null) {
             String jsonLastOrderLocation = mSharedPreferences.getString(LAST_ORDER_LOCATION_TAG, null);
             mLastOrderLocation = gson.fromJson(jsonLastOrderLocation, LatLng.class);
         }
