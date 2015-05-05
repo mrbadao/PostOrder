@@ -154,7 +154,7 @@
             android:layout_height="wrap_content"
             android:text="Báo trễ"
             android:layout_weight="1"
-            android:id="@+id/btnReport" />
+            android:id="@+id/btnDelay" />
     </TableRow>
 
 </TableLayout>

@@ -23,6 +23,7 @@ public class OrderDetailActivity extends ActionBarActivity implements ActionBar.
     OrderDetailSectionsPagerAdapter mSectionsPagerAdapter;
 
     private String orderId;
+    private String phoneNumber;
 
     ViewPager mViewPager;
 
@@ -36,6 +37,10 @@ public class OrderDetailActivity extends ActionBarActivity implements ActionBar.
 
         if (intent.hasExtra("orderId")) {
             orderId = intent.getStringExtra("orderId");
+        }
+
+        if(intent.hasExtra("phoneNumber")){
+            phoneNumber = intent.getStringExtra("phoneNumber");
         }
 
         // Set up the action bar.

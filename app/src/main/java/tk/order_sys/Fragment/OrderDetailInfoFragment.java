@@ -4,6 +4,7 @@ package tk.order_sys.Fragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -37,11 +38,13 @@ public class OrderDetailInfoFragment extends Fragment implements View.OnClickLis
     View rootView;
     TextView txtOrderDetailInfoCustomerName, txtOrderDetailInfoPhone, txtOrderDetailInfoCreated, txtOrderDetailInfoOrderName, txtOrderDetailInfoAddress;
     Button btnComplete;
+    Button btnDelay;
 
     private String orderId;
     private String mPrefsTag;
     private String mToken;
     private String mStaffID;
+    private String mPhoneNumber;
 
     public OrderDetailInfoFragment() {
 
@@ -52,6 +55,7 @@ public class OrderDetailInfoFragment extends Fragment implements View.OnClickLis
         mPrefsTag = null;
         mToken = null;
         mStaffID = null;
+        mPhoneNumber = null;
 
         rootView = inflater.inflate(R.layout.fragment_order_detail_info, container, false);
 
@@ -62,7 +66,10 @@ public class OrderDetailInfoFragment extends Fragment implements View.OnClickLis
         txtOrderDetailInfoAddress = (TextView) rootView.findViewById(R.id.txtOrderDetailInfoAddress);
 
         btnComplete = (Button) rootView.findViewById(R.id.btnCompleted);
+        btnDelay = (Button) rootView.findViewById(R.id.btnDelay);
+
         btnComplete.setOnClickListener(this);
+        btnDelay.setOnClickListener(this);
 
         orderId = null;
         orderId = ((OrderDetailActivity) getActivity()).getOrderId();
@@ -99,7 +106,8 @@ public class OrderDetailInfoFragment extends Fragment implements View.OnClickLis
         }
 
         if (sharedPreferences.contains(mPrefsTag + "order_phone")) {
-            txtOrderDetailInfoPhone.setText(sharedPreferences.getString(mPrefsTag + "order_phone", null));
+            mPhoneNumber = sharedPreferences.getString(mPrefsTag + "order_phone", null);
+            txtOrderDetailInfoPhone.setText(mPhoneNumber);
         }
 
 //        if(sharedPreferences.contains(PrefsTag + "order_address")){
@@ -127,6 +135,12 @@ public class OrderDetailInfoFragment extends Fragment implements View.OnClickLis
                     }
                 }
 
+                break;
+
+            case R.id.btnDelay:
+                if(mPhoneNumber != null){
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", mPhoneNumber, null)));
+                }
                 break;
         }
     }

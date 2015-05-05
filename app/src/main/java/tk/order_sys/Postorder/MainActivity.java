@@ -36,12 +36,18 @@ public class MainActivity extends ActionBarActivity implements LoginFragment.Log
 
         fragmentManager = getSupportFragmentManager();
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Init();
+    }
+
+    private void Init() {
         if (!appConfig.isNetworkAvailable(this)) {
             PostOrderDialog.showNetworkAlertDialog(this);
-        }
-
-        if (savedInstanceState == null) {
+        } else {
             if (mSharedPreferences != null && mSharedPreferences.contains(LoginFragment.PREF_STAFF_TOKEN_TAG) && mSharedPreferences.contains(LoginFragment.PREF_STAFF_ID_TAG)) {
                 String Token = mSharedPreferences.getString(LoginFragment.PREF_STAFF_TOKEN_TAG, null);
                 String StaffID = mSharedPreferences.getString(LoginFragment.PREF_STAFF_ID_TAG, null);
@@ -58,11 +64,8 @@ public class MainActivity extends ActionBarActivity implements LoginFragment.Log
             } else {
                 onCheckToken(null);
             }
-
-
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
