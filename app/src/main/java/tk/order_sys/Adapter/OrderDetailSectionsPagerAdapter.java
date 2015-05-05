@@ -26,7 +26,7 @@ public class OrderDetailSectionsPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         Fragment sectionFragment = null;
 
-        switch (position){
+        switch (position) {
             case 1:
                 sectionFragment = new OrderDetailProductsFragment();
                 break;

@@ -14,11 +14,11 @@ public class appConfig {
     private static final String _sharePreferenceTag = "tk.order_sys.postorder";
 
 
-
-    public static String getSharePreferenceTag(String tag){
+    public static String getSharePreferenceTag(String tag) {
         return _sharePreferenceTag + "." + tag;
     }
-    public static String getSharePreferenceTag(){
+
+    public static String getSharePreferenceTag() {
         return _sharePreferenceTag;
     }
 

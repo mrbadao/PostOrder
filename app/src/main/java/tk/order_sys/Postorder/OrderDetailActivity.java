@@ -34,7 +34,7 @@ public class OrderDetailActivity extends ActionBarActivity implements ActionBar.
 
         Intent intent = getIntent();
 
-        if(intent.hasExtra("orderId")){
+        if (intent.hasExtra("orderId")) {
             orderId = intent.getStringExtra("orderId");
         }
 
@@ -82,22 +82,22 @@ public class OrderDetailActivity extends ActionBarActivity implements ActionBar.
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        switch (id){
+        switch (id) {
             case R.id.action_map:
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
                 Gson gson = new Gson();
-                double lat = 0 , lng = 0;
+                double lat = 0, lng = 0;
                 String mPrefsTag = MainFragment.PREFS_ORDER_TAG + "." + orderId + ".";
 
-                if(sharedPreferences.contains(mPrefsTag + "coordinate_lat") && sharedPreferences.contains(mPrefsTag + "coordinate_long")){
-                    lat = Double.parseDouble(sharedPreferences.getString(mPrefsTag + "coordinate_lat","0"));
-                    lng = Double.parseDouble(sharedPreferences.getString(mPrefsTag + "coordinate_long","0"));
+                if (sharedPreferences.contains(mPrefsTag + "coordinate_lat") && sharedPreferences.contains(mPrefsTag + "coordinate_long")) {
+                    lat = Double.parseDouble(sharedPreferences.getString(mPrefsTag + "coordinate_lat", "0"));
+                    lng = Double.parseDouble(sharedPreferences.getString(mPrefsTag + "coordinate_long", "0"));
                 }
 
                 Intent intentOrdersMap = new Intent(OrderDetailActivity.this, OrdersMapActivity.class);
 
-                if(lat != 0 & lng !=0){
-                    LatLng latLng  = new LatLng(lat, lng);
+                if (lat != 0 & lng != 0) {
+                    LatLng latLng = new LatLng(lat, lng);
                     intentOrdersMap.putExtra(OrdersMapActivity.PREF_LAST_ORDER_LOCATION_TAG, gson.toJson(latLng).toString());
                 }
                 startActivityForResult(intentOrdersMap, ORDERS_MAPS_ACTIVITY_CODE);
@@ -105,7 +105,7 @@ public class OrderDetailActivity extends ActionBarActivity implements ActionBar.
                 return true;
 
             case R.id.action_settings:
-                Intent intentSettings =  new Intent(getApplicationContext(), SettingsActivity.class);
+                Intent intentSettings = new Intent(getApplicationContext(), SettingsActivity.class);
                 startActivity(intentSettings);
                 return true;
         }
@@ -126,7 +126,7 @@ public class OrderDetailActivity extends ActionBarActivity implements ActionBar.
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
-    public String getOrderId(){
+    public String getOrderId() {
         return orderId;
     }
 }

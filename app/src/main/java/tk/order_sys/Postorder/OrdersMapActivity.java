@@ -77,9 +77,9 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
 
         Intent intent = getIntent();
 
-        if(intent.hasExtra(PREF_LAST_ORDER_LOCATION_TAG)){
+        if (intent.hasExtra(PREF_LAST_ORDER_LOCATION_TAG)) {
             String jsonLastOrderLocation = intent.getStringExtra(PREF_LAST_ORDER_LOCATION_TAG);
-            if(!jsonLastOrderLocation.isEmpty()){
+            if (!jsonLastOrderLocation.isEmpty()) {
                 Gson gson = new Gson();
                 mLastOrderLocation = gson.fromJson(jsonLastOrderLocation, LatLng.class);
             }
@@ -161,21 +161,20 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
     @Override
     public boolean onMarkerClick(Marker marker) {
 //        if (mCurrentLocation != null) {
-            mCurrenOrederMarkerIndex = marker.getId();
-            mLastOrderLocation = marker.getPosition();
+        mCurrenOrederMarkerIndex = marker.getId();
+        mLastOrderLocation = marker.getPosition();
 
-            if (mSharedPreferences != null && mLastOrderLocation !=null)
-            {
-                Intent mOrderTracingService = new Intent(OrdersMapActivity.this, OrderTracingService.class);
-                mOrderTracingService.setAction(ORDER_TRACING_SERVICE_ACTION_GET_ROUTING);
+        if (mSharedPreferences != null && mLastOrderLocation != null) {
+            Intent mOrderTracingService = new Intent(OrdersMapActivity.this, OrderTracingService.class);
+            mOrderTracingService.setAction(ORDER_TRACING_SERVICE_ACTION_GET_ROUTING);
 
-                Gson gson = new Gson();
+            Gson gson = new Gson();
 
-                String jsonLastOrderLocation = gson.toJson(mLastOrderLocation);
-                mOrderTracingService.putExtra(ORDER_TRACING_SERVICE_PARAM_LAST_ORDER_LOCATION, jsonLastOrderLocation);
+            String jsonLastOrderLocation = gson.toJson(mLastOrderLocation);
+            mOrderTracingService.putExtra(ORDER_TRACING_SERVICE_PARAM_LAST_ORDER_LOCATION, jsonLastOrderLocation);
 
-                startService(mOrderTracingService);
-            }
+            startService(mOrderTracingService);
+        }
 //        }
 
         return false;
@@ -186,16 +185,16 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
         String tilte = null;
         mOrderMarkersArrayList.clear();
 
-        Map<String,?> mapOrders =  mSharedPreferences.getAll();
+        Map<String, ?> mapOrders = mSharedPreferences.getAll();
 
         for (Map.Entry<String, ?> entry : mapOrders.entrySet()) {
             key = entry.getKey();
-            if(key.matches("tk.order_sys.postorder.order.[0-9]*.name")) {
-                key= key.substring(0, entry.getKey().length() - 4);
+            if (key.matches("tk.order_sys.postorder.order.[0-9]*.name")) {
+                key = key.substring(0, entry.getKey().length() - 4);
 
                 tilte = entry.getValue().toString();
 
-                if(mapOrders.containsKey(key + "coordinate_lat") && mapOrders.containsKey(key + "coordinate_long")){
+                if (mapOrders.containsKey(key + "coordinate_lat") && mapOrders.containsKey(key + "coordinate_long")) {
                     Double lat = Double.parseDouble(mapOrders.get(key + "coordinate_lat").toString());
                     Double lng = Double.parseDouble(mapOrders.get(key + "coordinate_long").toString());
 
@@ -203,9 +202,9 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
                     markerOptions.position(new LatLng(lat, lng));
                     markerOptions.title(tilte);
 
-                    if(mLastOrderLocation != null && mLastOrderLocation.latitude == lat && mLastOrderLocation.longitude == lng){
+                    if (mLastOrderLocation != null && mLastOrderLocation.latitude == lat && mLastOrderLocation.longitude == lng) {
                         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                    }else {
+                    } else {
                         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                     }
 
@@ -251,12 +250,12 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
     @Override
     public void onCurrentLocationReceived(Context context, Intent intent) {
 
-        if (intent.hasExtra(OrderTracingService.SERVICE_START_FAILED)){
+        if (intent.hasExtra(OrderTracingService.SERVICE_START_FAILED)) {
             PostOrderDialog.showAlertDialog(this, "Cảnh báo", " Ứng dụng cầnđược truy cập mạng và vị trí của bạn. Hãy kiểm tra thiết bị và thữ lại");
             return;
         }
 
-        if (intent.hasExtra(OrderTracingService.DATA_ROUTING_FAILED)){
+        if (intent.hasExtra(OrderTracingService.DATA_ROUTING_FAILED)) {
             mCurrenOrederMarkerIndex = null;
             mLastOrderLocation = null;
             return;
@@ -267,23 +266,23 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
 
         Gson gson = new Gson();
 
-        if(intent.hasExtra(OrderTracingService.DATA_LOCATION)) {
+        if (intent.hasExtra(OrderTracingService.DATA_LOCATION)) {
             mCurrentLocation = gson.fromJson(intent.getStringExtra(OrderTracingService.DATA_LOCATION), LatLng.class);
         }
 
-        if(intent.hasExtra(OrderTracingService.DATA_ROUTING)){
+        if (intent.hasExtra(OrderTracingService.DATA_ROUTING)) {
             route = gson.fromJson(intent.getStringExtra(OrderTracingService.DATA_ROUTING), Route.class);
         }
 
-        if(intent.hasExtra(OrderTracingService.DATA_POLY_OPTIONS)){
+        if (intent.hasExtra(OrderTracingService.DATA_POLY_OPTIONS)) {
             mPolyOptions = gson.fromJson(intent.getStringExtra(OrderTracingService.DATA_POLY_OPTIONS), PolylineOptions.class);
         }
 
-        if(intent.hasExtra(OrderTracingService.DATA_LOCATION)){
-            mLastOrderLocation =  gson.fromJson(intent.getStringExtra(OrderTracingService.DATA_LAST_ORDER_LOCATION), LatLng.class);
+        if (intent.hasExtra(OrderTracingService.DATA_LOCATION)) {
+            mLastOrderLocation = gson.fromJson(intent.getStringExtra(OrderTracingService.DATA_LAST_ORDER_LOCATION), LatLng.class);
         }
 
-        if(route != null && mPolyOptions != null) {
+        if (route != null && mPolyOptions != null) {
             if (mRoutingLastPolyLine != null) {
                 mRoutingLastPolyLine.remove();
             }

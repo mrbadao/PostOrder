@@ -26,7 +26,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
 
-import tk.order_sys.Dialogs.PostOrderDialog;
 import tk.order_sys.Postorder.OrdersMapActivity;
 import tk.order_sys.Postorder.R;
 import tk.order_sys.config.Constants;
@@ -61,6 +60,7 @@ public class OrderTracingService extends Service implements LocationListener, Ro
     private String mPhonenumber;
 
     private int mNotifyId = 104;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -78,16 +78,16 @@ public class OrderTracingService extends Service implements LocationListener, Ro
 
         String intentAction = intent.getAction();
 
-        if(intentAction.equals(OrdersMapActivity.ORDER_TRACING_SERVICE_ACTION_GET_ROUTING)) {
+        if (intentAction.equals(OrdersMapActivity.ORDER_TRACING_SERVICE_ACTION_GET_ROUTING)) {
             Criteria criteria = new Criteria();
             mProvider = locationManager.getBestProvider(criteria, true);
 
-            if(!appConfig.isNetworkAvailable(getApplicationContext()) || mProvider.isEmpty()){
-                Intent intentAlert =  new Intent(BROADCAST_ACTION).putExtra(SERVICE_START_FAILED, true);
+            if (!appConfig.isNetworkAvailable(getApplicationContext()) || mProvider.isEmpty()) {
+                Intent intentAlert = new Intent(BROADCAST_ACTION).putExtra(SERVICE_START_FAILED, true);
                 LocalBroadcastManager.getInstance(this).sendBroadcast(intentAlert);
                 stopSelf();
             }
-            
+
             //Get Lastorder location
             if (intent.hasExtra(OrdersMapActivity.ORDER_TRACING_SERVICE_PARAM_LAST_ORDER_LOCATION)) {
                 Gson gson = new Gson();
@@ -115,7 +115,7 @@ public class OrderTracingService extends Service implements LocationListener, Ro
             }
         }
 
-        if (intentAction.equals(OrdersMapActivity.ORDER_TRACING_SERVICE_ACTION_CLOSE)){
+        if (intentAction.equals(OrdersMapActivity.ORDER_TRACING_SERVICE_ACTION_CLOSE)) {
             saveCurrentLocation();
             stopSelf();
         }
@@ -154,7 +154,8 @@ public class OrderTracingService extends Service implements LocationListener, Ro
     public void onProviderEnabled(String provider) {
         Criteria criteria = new Criteria();
         mProvider = locationManager.getBestProvider(criteria, true);
-        if(mProvider.isEmpty()) Toast.makeText(getApplicationContext(), "null",Toast.LENGTH_SHORT).show();
+        if (mProvider.isEmpty())
+            Toast.makeText(getApplicationContext(), "null", Toast.LENGTH_SHORT).show();
         locationManager.requestLocationUpdates(mProvider, mGpsUpdateMinTime, mGpsUpdateMinDistance, this);
     }
 
@@ -165,16 +166,16 @@ public class OrderTracingService extends Service implements LocationListener, Ro
         locationManager.requestLocationUpdates(mProvider, mGpsUpdateMinTime, mGpsUpdateMinDistance, this);
     }
 
-    private void reportLocation(){
+    private void reportLocation() {
         Gson gson = new Gson();
-        if(mCurrentLocation != null){
+        if (mCurrentLocation != null) {
             String jsonCurrentLocation = gson.toJson(mCurrentLocation);
             Intent localIntent = new Intent(BROADCAST_ACTION).putExtra(DATA_LOCATION, jsonCurrentLocation);
             LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
         }
     }
 
-    private LatLng loadSavedLocation(){
+    private LatLng loadSavedLocation() {
         SharedPreferences mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         Gson gson = new Gson();
         LatLng latLng = null;
@@ -201,8 +202,7 @@ public class OrderTracingService extends Service implements LocationListener, Ro
     public void onRoutingSuccess(PolylineOptions mPolyOptions, Route route) {
         Gson gson = new Gson();
 
-        if(mCurrentLocation != null)
-        {
+        if (mCurrentLocation != null) {
             String jsonCurrentLocation = gson.toJson(mCurrentLocation);
             String jsonRoute = gson.toJson(route);
             String jsonPolyOptions = gson.toJson(mPolyOptions);
@@ -218,7 +218,7 @@ public class OrderTracingService extends Service implements LocationListener, Ro
             LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
         }
 
-        if(!isSentSMS && isSendNoticeSms && distanceSendNoticeSms >= route.getLength()){
+        if (!isSentSMS && isSendNoticeSms && distanceSendNoticeSms >= route.getLength()) {
             sendNoticeSms();
         }
     }
@@ -231,28 +231,28 @@ public class OrderTracingService extends Service implements LocationListener, Ro
         }
     }
 
-    private void loadAppSetting(){
+    private void loadAppSetting() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
-        if (sharedPreferences.contains(Constants.SETTING_GPS_UPDATE_DISTANCE)){
+        if (sharedPreferences.contains(Constants.SETTING_GPS_UPDATE_DISTANCE)) {
             mGpsUpdateMinDistance = Long.parseLong(sharedPreferences.getString(Constants.SETTING_GPS_UPDATE_DISTANCE, "0"));
         }
 
-        if (sharedPreferences.contains(Constants.SETTING_GPS_UPDATE_MIN_TIME)){
+        if (sharedPreferences.contains(Constants.SETTING_GPS_UPDATE_MIN_TIME)) {
             mGpsUpdateMinTime = 1000 * 10 * Long.parseLong(sharedPreferences.getString(Constants.SETTING_GPS_UPDATE_MIN_TIME, "1"));
         }
 
-        if (sharedPreferences.contains(Constants.SETTING_SMS_SEND_FLAG)){
+        if (sharedPreferences.contains(Constants.SETTING_SMS_SEND_FLAG)) {
             isSendNoticeSms = sharedPreferences.getBoolean(Constants.SETTING_SMS_SEND_FLAG, true);
         }
 
-        if (sharedPreferences.contains(Constants.SETTING_SMS_SEND_DISTANCE)){
+        if (sharedPreferences.contains(Constants.SETTING_SMS_SEND_DISTANCE)) {
             distanceSendNoticeSms = Integer.parseInt(sharedPreferences.getString(Constants.SETTING_SMS_SEND_DISTANCE, "1000"));
         }
     }
 
-    private void sendNotification(String msg){
-        try{
+    private void sendNotification(String msg) {
+        try {
             NotificationCompat.Builder mBuilder =
                     new NotificationCompat.Builder(this)
                             .setSmallIcon(R.drawable.ic_actionbar_ico)
@@ -275,10 +275,12 @@ public class OrderTracingService extends Service implements LocationListener, Ro
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
             mNotificationManager.notify(mNotifyId, mBuilder.build());
-        }catch (Exception e){e.printStackTrace();}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    private void sendNoticeSms(){
+    private void sendNoticeSms() {
         try {
             String message = "Đây là tin nhắn nhắc nhỡ về đơn hàng bạn đã đặt. Đơn hàng của bạn đang trên đường tới.";
 

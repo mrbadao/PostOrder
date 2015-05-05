@@ -12,7 +12,7 @@ import tk.order_sys.PostOrderInterface.LocationReceiverInterface;
 public class LocationReceiver extends BroadcastReceiver {
     LocationReceiverInterface locationReceiverInterface;
 
-    public LocationReceiver(LocationReceiverInterface locationReceiverInterface){
+    public LocationReceiver(LocationReceiverInterface locationReceiverInterface) {
         this.locationReceiverInterface = locationReceiverInterface;
     }
 

@@ -26,7 +26,6 @@ public class SettingsActivity extends ActionBarActivity {
     }
 
 
-
     public static class SettingsFragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle paramBundle) {

@@ -25,7 +25,7 @@ import tk.order_sys.Postorder.R;
 /**
  * Created by mrbadao on 30/04/2015.
  */
-public class OrderDetailProductsFragment extends Fragment implements OrderDetailInterface{
+public class OrderDetailProductsFragment extends Fragment implements OrderDetailInterface {
     View rootView;
     String orderID;
     String mPrefsTag;
@@ -42,7 +42,7 @@ public class OrderDetailProductsFragment extends Fragment implements OrderDetail
         rootView = inflater.inflate(R.layout.fragment_order_detail_products, container, false);
         tableLayoutProducts = (TableLayout) rootView.findViewById(R.id.tableLayoutOrderDetailInfo);
 
-        orderID = ((OrderDetailActivity)getActivity()).getOrderId();
+        orderID = ((OrderDetailActivity) getActivity()).getOrderId();
         mPrefsTag = MainFragment.PREFS_ORDER_TAG + "." + orderID + ".detail";
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -52,7 +52,7 @@ public class OrderDetailProductsFragment extends Fragment implements OrderDetail
 
             String strOderDetail = sharedPreferences.getString(mPrefsTag, null);
 
-            if(strOderDetail != null){
+            if (strOderDetail != null) {
                 try {
                     jsonOrderDetail = new JSONObject(strOderDetail);
                     onGetOrderDetail(jsonOrderDetail);
@@ -60,17 +60,17 @@ public class OrderDetailProductsFragment extends Fragment implements OrderDetail
                     e.printStackTrace();
                 }
             }
-        }else{
+        } else {
             String Token = sharedPreferences.contains(LoginFragment.PREF_STAFF_TOKEN_TAG) ? sharedPreferences.getString(LoginFragment.PREF_STAFF_TOKEN_TAG, null) : null;
             String StaffID = sharedPreferences.contains(LoginFragment.PREF_STAFF_ID_TAG) ? sharedPreferences.getString(LoginFragment.PREF_STAFF_ID_TAG, null) : null;
 
-            if(Token != null && StaffID !=null && orderID != null) {
+            if (Token != null && StaffID != null && orderID != null) {
                 JSONObject params = new JSONObject();
 
                 try {
-                    params.put("token", Token );
-                    params.put("staff_id", StaffID );
-                    params.put("order_id", orderID );
+                    params.put("token", Token);
+                    params.put("staff_id", StaffID);
+                    params.put("order_id", orderID);
                     new DeliveryGetOrderDetailHttpRequest(getActivity(), null, this).execute(params);
 
                 } catch (JSONException e) {
@@ -86,17 +86,17 @@ public class OrderDetailProductsFragment extends Fragment implements OrderDetail
 
     @Override
     public void onGetOrderDetail(JSONObject jsonObject) {
-        if (jsonObject != null){
+        if (jsonObject != null) {
             Long cost, total = Long.valueOf(0);
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
             Log.i("JSON", jsonObject.toString());
             try {
-                if(!jsonObject.isNull("order")){
+                if (!jsonObject.isNull("order")) {
                     JSONArray jsonOrderArray = jsonObject.getJSONArray("order");
                     JSONObject jsonItem = null;
                     TableRow tableRow = null;
 
-                    for (int i = 0; i < jsonOrderArray.length(); i++){
+                    for (int i = 0; i < jsonOrderArray.length(); i++) {
                         jsonItem = jsonOrderArray.getJSONObject(i);
                         tableRow = (TableRow) LayoutInflater.from(getActivity()).inflate(R.layout.fragment_order_detail_products_table_row, null);
                         TextView txtOrderDetailProductName = (TextView) tableRow.findViewById(R.id.txtOrderDetailProductName);
@@ -123,7 +123,7 @@ public class OrderDetailProductsFragment extends Fragment implements OrderDetail
                 e.printStackTrace();
             }
 
-            if(!sharedPreferences.contains(mPrefsTag)){
+            if (!sharedPreferences.contains(mPrefsTag)) {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString(mPrefsTag, jsonObject.toString());
                 editor.commit();

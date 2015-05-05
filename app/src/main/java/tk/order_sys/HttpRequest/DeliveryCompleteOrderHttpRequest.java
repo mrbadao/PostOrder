@@ -8,7 +8,6 @@ import org.json.JSONObject;
 
 import tk.order_sys.API.API;
 import tk.order_sys.HttpRequestInterface.OrderActionInterface;
-import tk.order_sys.HttpRequestInterface.OrdersInterface;
 
 /**
  * Created by mrbadao on 13/04/2015.

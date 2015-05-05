@@ -31,7 +31,7 @@ import tk.order_sys.Postorder.R;
 /**
  * Created by mrbadao on 30/04/2015.
  */
-public class OrderDetailInfoFragment extends Fragment implements View.OnClickListener, OrderActionInterface{
+public class OrderDetailInfoFragment extends Fragment implements View.OnClickListener, OrderActionInterface {
     public static final String CALL_BACK_ORDER_COMPLETED_FLAG = "oderCompleted";
 
     View rootView;
@@ -65,40 +65,40 @@ public class OrderDetailInfoFragment extends Fragment implements View.OnClickLis
         btnComplete.setOnClickListener(this);
 
         orderId = null;
-        orderId = ((OrderDetailActivity)getActivity()).getOrderId();
+        orderId = ((OrderDetailActivity) getActivity()).getOrderId();
 
         render();
 
         return rootView;
     }
 
-    private void render(){
-        SharedPreferences sharedPreferences= PreferenceManager.getDefaultSharedPreferences(getActivity());
+    private void render() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         mPrefsTag = MainFragment.PREFS_ORDER_TAG + "." + orderId + ".";
         Log.i("INFO", mPrefsTag);
 
-        if(sharedPreferences.contains(LoginFragment.PREF_STAFF_TOKEN_TAG)){
+        if (sharedPreferences.contains(LoginFragment.PREF_STAFF_TOKEN_TAG)) {
             mToken = sharedPreferences.getString(LoginFragment.PREF_STAFF_TOKEN_TAG, null);
         }
 
-        if(sharedPreferences.contains(LoginFragment.PREF_STAFF_ID_TAG)){
+        if (sharedPreferences.contains(LoginFragment.PREF_STAFF_ID_TAG)) {
             mStaffID = sharedPreferences.getString(LoginFragment.PREF_STAFF_ID_TAG, null);
         }
 
-        if(sharedPreferences.contains(mPrefsTag + "name")){
-            txtOrderDetailInfoOrderName.setText("MS: " +  sharedPreferences.getString(mPrefsTag + "name", null));
+        if (sharedPreferences.contains(mPrefsTag + "name")) {
+            txtOrderDetailInfoOrderName.setText("MS: " + sharedPreferences.getString(mPrefsTag + "name", null));
         }
 
-        if(sharedPreferences.contains(mPrefsTag + "customer_name")){
+        if (sharedPreferences.contains(mPrefsTag + "customer_name")) {
             txtOrderDetailInfoCustomerName.setText(sharedPreferences.getString(mPrefsTag + "customer_name", null));
         }
 
-        if(sharedPreferences.contains(mPrefsTag + "created")){
+        if (sharedPreferences.contains(mPrefsTag + "created")) {
             txtOrderDetailInfoCreated.setText(sharedPreferences.getString(mPrefsTag + "created", null));
         }
 
-        if(sharedPreferences.contains(mPrefsTag + "order_phone")){
+        if (sharedPreferences.contains(mPrefsTag + "order_phone")) {
             txtOrderDetailInfoPhone.setText(sharedPreferences.getString(mPrefsTag + "order_phone", null));
         }
 
@@ -110,19 +110,19 @@ public class OrderDetailInfoFragment extends Fragment implements View.OnClickLis
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        switch (id){
+        switch (id) {
             case R.id.btnCompleted:
-                if(mToken != null && mStaffID != null){
+                if (mToken != null && mStaffID != null) {
                     JSONObject params = new JSONObject();
 
                     try {
-                        params.put("token",mToken);
-                        params.put("staff_id",mStaffID);
-                        params.put("order_id",orderId);
+                        params.put("token", mToken);
+                        params.put("staff_id", mStaffID);
+                        params.put("order_id", orderId);
 
                         new DeliveryCompleteOrderHttpRequest(getActivity(), null, this).execute(params);
 
-                    }catch (JSONException e){
+                    } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
@@ -133,7 +133,7 @@ public class OrderDetailInfoFragment extends Fragment implements View.OnClickLis
 
     @Override
     public void onCompleteOrder(JSONObject jsonObject) {
-        if(jsonObject !=null) {
+        if (jsonObject != null) {
             try {
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
                 SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -141,15 +141,15 @@ public class OrderDetailInfoFragment extends Fragment implements View.OnClickLis
                 if (!jsonObject.isNull("error")) {
                     int errorCode = jsonObject.getJSONObject("error").getInt("error_code");
 
-                    if(errorCode == 1015){
+                    if (errorCode == 1015) {
 
                     }
                 }
 
-                if(!jsonObject.isNull("status")){
+                if (!jsonObject.isNull("status")) {
                     int statusCode = jsonObject.getJSONObject("status").getInt("status_code");
 
-                    if(statusCode == 1016){
+                    if (statusCode == 1016) {
                         if (sharedPreferences.contains(mPrefsTag + "name")) {
                             editor.remove(mPrefsTag + "name");
                         }
@@ -195,10 +195,10 @@ public class OrderDetailInfoFragment extends Fragment implements View.OnClickLis
                             editor.remove(mPrefsTag + "detail");
                         }
 
-                        if(sharedPreferences.contains(OrdersMapActivity.LAST_ORDER_LOCATION_TAG)){
+                        if (sharedPreferences.contains(OrdersMapActivity.LAST_ORDER_LOCATION_TAG)) {
                             Gson gson = new Gson();
                             LatLng latLng = gson.fromJson(sharedPreferences.getString(OrdersMapActivity.LAST_ORDER_LOCATION_TAG, null), LatLng.class);
-                            if(String.valueOf(latLng.latitude).equals(lat) && String.valueOf(latLng.longitude).equals(lng)){
+                            if (String.valueOf(latLng.latitude).equals(lat) && String.valueOf(latLng.longitude).equals(lng)) {
                                 editor.remove(OrdersMapActivity.LAST_ORDER_LOCATION_TAG);
 
                                 Intent mOrderTracingService = new Intent(getActivity(), OrderTracingService.class);
@@ -219,7 +219,9 @@ public class OrderDetailInfoFragment extends Fragment implements View.OnClickLis
                         getActivity().finish();
                     }
                 }
-            } catch (JSONException e) { e.printStackTrace(); }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

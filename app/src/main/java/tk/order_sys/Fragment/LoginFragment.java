@@ -39,13 +39,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Del
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        ((MainActivity)getActivity()).onShowHideActionBar(false);
+        ((MainActivity) getActivity()).onShowHideActionBar(false);
         delegate = (LoginInterface) getActivity();
 
         rootView = inflater.inflate(R.layout.fragment_login, container, false);
-        mUsername =(EditText) rootView.findViewById(R.id.txtLoginID);
-        mPassword =(EditText) rootView.findViewById(R.id.txtLoginPassword);
-        mProgressBar =(ProgressBar) rootView.findViewById(R.id.progressbarLogin);
+        mUsername = (EditText) rootView.findViewById(R.id.txtLoginID);
+        mPassword = (EditText) rootView.findViewById(R.id.txtLoginPassword);
+        mProgressBar = (ProgressBar) rootView.findViewById(R.id.progressbarLogin);
         Button btnLogin = (Button) rootView.findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(this);
 
@@ -55,19 +55,18 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Del
     @Override
     public void onClick(View v) {
         int itemId = v.getId();
-        switch (itemId){
+        switch (itemId) {
             case R.id.btnLogin:
                 String username = String.valueOf(mUsername.getText());
                 String password = String.valueOf(mPassword.getText());
-                if(username.isEmpty() && password.isEmpty()){
-                    Toast.makeText(getActivity().getApplicationContext(), "Tài khoản và mật khẩu không được rỗng",Toast.LENGTH_SHORT).show();
-                }
-                else {
+                if (username.isEmpty() && password.isEmpty()) {
+                    Toast.makeText(getActivity().getApplicationContext(), "Tài khoản và mật khẩu không được rỗng", Toast.LENGTH_SHORT).show();
+                } else {
                     JSONObject jsonParams = new JSONObject();
                     try {
                         jsonParams.put("login_id", username);
                         jsonParams.put("password", password);
-                        new DeliveryLoginHttpRequest(getActivity(),null,this).execute(jsonParams);
+                        new DeliveryLoginHttpRequest(getActivity(), null, this).execute(jsonParams);
                         mProgressBar.setVisibility(View.VISIBLE);
                     } catch (JSONException e) {
                         mProgressBar.setVisibility(View.INVISIBLE);
@@ -86,18 +85,18 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Del
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
                 SharedPreferences.Editor editor = sharedPreferences.edit();
 
-                if (!jsonObject.isNull("error")){
-                    Toast.makeText(getActivity().getApplicationContext(),"Tài khoản hoặc mật khẩu không đúng.",Toast.LENGTH_SHORT).show();
+                if (!jsonObject.isNull("error")) {
+                    Toast.makeText(getActivity().getApplicationContext(), "Tài khoản hoặc mật khẩu không đúng.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if(!jsonObject.isNull("token")){
+                if (!jsonObject.isNull("token")) {
                     editor.putString(PREF_STAFF_TOKEN_TAG, jsonObject.getString("token"));
-                }else return;
+                } else return;
 
-                if (!jsonObject.isNull("staff")){
+                if (!jsonObject.isNull("staff")) {
                     editor.putString(PREF_STAFF_ID_TAG, jsonObject.getJSONObject("staff").getString("id"));
-                }else return;
+                } else return;
 
                 editor.commit();
 
@@ -113,7 +112,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Del
         return;
     }
 
-    public interface LoginInterface{
+    public interface LoginInterface {
         void onLoginSuccess();
     }
 }

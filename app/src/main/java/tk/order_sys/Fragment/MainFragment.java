@@ -60,7 +60,7 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        ((MainActivity)getActivity()).onShowHideActionBar(true);
+        ((MainActivity) getActivity()).onShowHideActionBar(true);
 
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
@@ -68,12 +68,12 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-        if(sharedPreferences.contains(LoginFragment.PREF_STAFF_TOKEN_TAG)){
+        if (sharedPreferences.contains(LoginFragment.PREF_STAFF_TOKEN_TAG)) {
             token = sharedPreferences.getString(LoginFragment.PREF_STAFF_TOKEN_TAG, null);
-            Log.i("token",token);
+            Log.i("token", token);
         }
 
-        if(sharedPreferences.contains(LoginFragment.PREF_STAFF_ID_TAG)){
+        if (sharedPreferences.contains(LoginFragment.PREF_STAFF_ID_TAG)) {
             staff_id = sharedPreferences.getString(LoginFragment.PREF_STAFF_ID_TAG, null);
             Log.i("staff_id", staff_id);
         }
@@ -88,7 +88,7 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String orderId = listOrders.get(position - 1).id;
-                if(orderId != null && !orderId.isEmpty()) {
+                if (orderId != null && !orderId.isEmpty()) {
                     Intent intentOrderDetail = new Intent(getActivity().getApplicationContext(), OrderDetailActivity.class);
                     intentOrderDetail.putExtra("orderId", orderId);
                     startActivityForResult(intentOrderDetail, ORDERS_DETAIL_ACTIVITY_CODE);
@@ -107,7 +107,7 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
         if (resultCode == Activity.RESULT_OK && (requestCode == ORDERS_DETAIL_ACTIVITY_CODE)) {
             if (data.hasExtra(OrderDetailInfoFragment.CALL_BACK_ORDER_COMPLETED_FLAG)) {
                 boolean flag = data.getBooleanExtra(OrderDetailInfoFragment.CALL_BACK_ORDER_COMPLETED_FLAG, false);
-                if(flag){
+                if (flag) {
 //                    onRefresh();
                 }
             }
@@ -119,7 +119,7 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
     private void getOrders() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-        if(token != null && staff_id != null){
+        if (token != null && staff_id != null) {
             JSONObject params = new JSONObject();
             try {
                 params.put("token", token);
@@ -127,7 +127,7 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
                 params.put("limit", LOAD_MORE_ITEMS);
                 params.put("offset", (page - 1) * LOAD_MORE_ITEMS);
                 new DeliveryGetOrdersHttpRequest(getActivity(), null, this).execute(params);
-            }catch (JSONException e){
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
 
@@ -168,8 +168,7 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
                     getOrders();
                     mAdapter.notifyDataSetChanged();
                     onLoad();
-                }
-                else {
+                } else {
                     xListViewOrders.stopLoadMore();
                     xListViewOrders.stopRefresh();
                 }
@@ -179,22 +178,22 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
 
     @Override
     public void onGetOrders(JSONObject jsonObject) {
-        if(jsonObject != null) {
+        if (jsonObject != null) {
             Log.i("Orders", jsonObject.toString());
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
             SharedPreferences.Editor editor = sharedPreferences.edit();
 
             try {
-                if(!jsonObject.isNull("count")){
+                if (!jsonObject.isNull("count")) {
                     pages = (int) Math.ceil(jsonObject.getDouble("count") / (double) LOAD_MORE_ITEMS);
                     Log.i("paging", String.valueOf(pages));
 
-                    if(pages <= page){
+                    if (pages <= page) {
                         xListViewOrders.setPullLoadEnable(false);
                     }
                 }
 
-                if (!jsonObject.isNull("orders")){
+                if (!jsonObject.isNull("orders")) {
                     JSONArray jsonOrders = jsonObject.getJSONArray("orders");
                     JSONObject jsonOrder = null;
                     Log.i("Count", String.valueOf(jsonOrders.length()));
@@ -202,10 +201,10 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
                     ContentOrder item = null;
                     String PrefsTag = null;
 
-                    for (int i = 0; i < jsonOrders.length(); i++){
+                    for (int i = 0; i < jsonOrders.length(); i++) {
                         jsonOrder = jsonOrders.getJSONObject(i);
 
-                         item = new ContentOrder(
+                        item = new ContentOrder(
                                 jsonOrder.getString("id"),
                                 jsonOrder.getString("name"),
                                 jsonOrder.getString("customer_name"),
@@ -217,19 +216,19 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
                                 jsonOrder.getString("created"),
                                 jsonOrder.getString("completed")
                         );
-                            Log.i("Item:", item.toString());
+                        Log.i("Item:", item.toString());
 
-                        if(!sharedPreferences.contains(PREFS_ORDER_TAG + "." + item.id)){
+                        if (!sharedPreferences.contains(PREFS_ORDER_TAG + "." + item.id)) {
                             PrefsTag = PREFS_ORDER_TAG + "." + item.id + ".";
                             Log.i("Item SP:", PrefsTag);
 
-                            editor.putString(PrefsTag + "name",item.name);
-                            editor.putString(PrefsTag + "customer_name",item.customer_name);
-                            editor.putString(PrefsTag + "order_phone",item.order_phone);
-                            editor.putString(PrefsTag + "coordinate_lat",item.coordinate_lat);
-                            editor.putString(PrefsTag + "coordinate_long",item.coordinate_long);
-                            editor.putString(PrefsTag + "delivery_id",item.delivery_id);
-                            editor.putString(PrefsTag + "status",item.status);
+                            editor.putString(PrefsTag + "name", item.name);
+                            editor.putString(PrefsTag + "customer_name", item.customer_name);
+                            editor.putString(PrefsTag + "order_phone", item.order_phone);
+                            editor.putString(PrefsTag + "coordinate_lat", item.coordinate_lat);
+                            editor.putString(PrefsTag + "coordinate_long", item.coordinate_long);
+                            editor.putString(PrefsTag + "delivery_id", item.delivery_id);
+                            editor.putString(PrefsTag + "status", item.status);
                             editor.putString(PrefsTag + "created", item.created);
 
                         }
@@ -239,13 +238,13 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
 
                     editor.commit();
 
-                    if(listOrders.size() > 0){
+                    if (listOrders.size() > 0) {
                         if (isFirstLoad) {
                             mAdapter = new OrdersAdapter(getActivity(), R.layout.orders_list_item, listOrders);
                             xListViewOrders.setAdapter(mAdapter);
                             xListViewOrders.setXListViewListener(this);
-                            isFirstLoad =false;
-                        }else {
+                            isFirstLoad = false;
+                        } else {
                             mAdapter.notifyDataSetChanged();
                             onLoad();
                         }
@@ -257,7 +256,7 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
         }
     }
 
-    public interface LogoutInterface{
+    public interface LogoutInterface {
         void onLogoutSuccess();
     }
 }

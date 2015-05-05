@@ -37,25 +37,25 @@ public class MainActivity extends ActionBarActivity implements LoginFragment.Log
         fragmentManager = getSupportFragmentManager();
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        if(!appConfig.isNetworkAvailable(this)){
+        if (!appConfig.isNetworkAvailable(this)) {
             PostOrderDialog.showNetworkAlertDialog(this);
         }
 
         if (savedInstanceState == null) {
-            if(mSharedPreferences != null && mSharedPreferences.contains(LoginFragment.PREF_STAFF_TOKEN_TAG) && mSharedPreferences.contains(LoginFragment.PREF_STAFF_ID_TAG)) {
+            if (mSharedPreferences != null && mSharedPreferences.contains(LoginFragment.PREF_STAFF_TOKEN_TAG) && mSharedPreferences.contains(LoginFragment.PREF_STAFF_ID_TAG)) {
                 String Token = mSharedPreferences.getString(LoginFragment.PREF_STAFF_TOKEN_TAG, null);
                 String StaffID = mSharedPreferences.getString(LoginFragment.PREF_STAFF_ID_TAG, null);
 
                 JSONObject params = new JSONObject();
                 try {
-                    params.put("token",Token);
-                    params.put("staff_id",StaffID);
+                    params.put("token", Token);
+                    params.put("staff_id", StaffID);
 
                     new DeliveryCheckTokenHttpRequest(getApplicationContext(), null, this).execute(params);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-            }else {
+            } else {
                 onCheckToken(null);
             }
 
@@ -74,14 +74,14 @@ public class MainActivity extends ActionBarActivity implements LoginFragment.Log
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        switch (id){
+        switch (id) {
             case R.id.action_map:
                 Intent intentOrdersMap = new Intent(getApplicationContext(), OrdersMapActivity.class);
                 startActivity(intentOrdersMap);
                 return true;
 
             case R.id.action_settings:
-                Intent intentSettings =  new Intent(getApplicationContext(), SettingsActivity.class);
+                Intent intentSettings = new Intent(getApplicationContext(), SettingsActivity.class);
                 startActivity(intentSettings);
                 return true;
             case R.id.action_logout:
@@ -99,7 +99,7 @@ public class MainActivity extends ActionBarActivity implements LoginFragment.Log
                 .commit();
     }
 
-    public void onShowHideActionBar(boolean flag){
+    public void onShowHideActionBar(boolean flag) {
         if (flag) getSupportActionBar().show();
         else {
             getSupportActionBar().hide();
@@ -126,24 +126,24 @@ public class MainActivity extends ActionBarActivity implements LoginFragment.Log
     public void onCheckToken(JSONObject jsonObject) {
         Fragment fragment = null;
 
-        if(jsonObject != null){
-            if(!jsonObject.isNull("status")){
+        if (jsonObject != null) {
+            if (!jsonObject.isNull("status")) {
                 int statusCode = 0;
 
                 try {
                     statusCode = jsonObject.getJSONObject("status").getInt("status_code");
-                    if(statusCode == 1017){
+                    if (statusCode == 1017) {
                         fragment = new MainFragment();
-                    }else fragment = new LoginFragment();
+                    } else fragment = new LoginFragment();
                 } catch (JSONException e) {
                     fragment = new LoginFragment();
                     e.printStackTrace();
                 }
 
-            }else{
+            } else {
                 fragment = new LoginFragment();
             }
-        }else {
+        } else {
             fragment = new LoginFragment();
         }
 

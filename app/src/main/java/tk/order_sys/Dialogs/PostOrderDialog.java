@@ -11,11 +11,11 @@ import android.provider.Settings;
  */
 public class PostOrderDialog {
 
-    public PostOrderDialog(){
+    public PostOrderDialog() {
 
     }
 
-    public static void showAlertDialog(Context context, String Title, String msg){
+    public static void showAlertDialog(Context context, String Title, String msg) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
 
         alertDialogBuilder.setTitle(Title);
@@ -33,7 +33,7 @@ public class PostOrderDialog {
         alertDialog.show();
     }
 
-    public static void showNetworkAlertDialog(Context context){
+    public static void showNetworkAlertDialog(Context context) {
         final Context _context = context;
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
 

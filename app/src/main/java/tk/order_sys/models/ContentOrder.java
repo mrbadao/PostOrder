@@ -19,11 +19,11 @@ public class ContentOrder implements Parcelable {
     public String completed;
 
     public ContentOrder() {
-        id = name = customer_name = order_phone =coordinate_lat = coordinate_long = delivery_id = status = completed = created = null;
+        id = name = customer_name = order_phone = coordinate_lat = coordinate_long = delivery_id = status = completed = created = null;
     }
 
     public ContentOrder(String id, String name, String customer_name, String order_phone, String coordinate_lat,
-                        String coordinate_long , String delivery_id, String status, String created, String completed) {
+                        String coordinate_long, String delivery_id, String status, String created, String completed) {
         this.id = id;
         this.name = name;
         this.customer_name = customer_name;
