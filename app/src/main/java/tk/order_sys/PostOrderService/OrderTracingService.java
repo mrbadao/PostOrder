@@ -17,6 +17,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.gsm.SmsManager;
+import android.widget.Toast;
 
 import com.directions.route.Route;
 import com.directions.route.Routing;
@@ -53,6 +54,7 @@ public class OrderTracingService extends Service implements LocationListener, Ro
 
     private boolean isSendNoticeSms;
     private int distanceSendNoticeSms;
+    private boolean isSentSMS = true;
 
     private int mNotifyId = 104;
     @Override
@@ -95,6 +97,7 @@ public class OrderTracingService extends Service implements LocationListener, Ro
             if (mCurrentLocation != null) {
                 if (mLastOrderLocation != null) {
                     getRouting(mCurrentLocation, mLastOrderLocation, mTravelMode);
+                    isSentSMS = false;
                 } else {
                     reportLocation();
                 }
@@ -134,6 +137,7 @@ public class OrderTracingService extends Service implements LocationListener, Ro
     public void onProviderEnabled(String provider) {
         Criteria criteria = new Criteria();
         mProvider = locationManager.getBestProvider(criteria, true);
+        if(mProvider.isEmpty()) Toast.makeText(getApplicationContext(), "null",Toast.LENGTH_SHORT).show();
         locationManager.requestLocationUpdates(mProvider, mGpsUpdateMinTime, mGpsUpdateMinDistance, this);
     }
 
@@ -197,7 +201,7 @@ public class OrderTracingService extends Service implements LocationListener, Ro
             LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
         }
 
-        if(isSendNoticeSms && distanceSendNoticeSms >= route.getLength()){
+        if(!isSentSMS && isSendNoticeSms && distanceSendNoticeSms >= route.getLength()){
             sendNoticeSms();
         }
     }
@@ -231,40 +235,44 @@ public class OrderTracingService extends Service implements LocationListener, Ro
     }
 
     private void sendNotification(String msg){
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_actionbar_ico)
-                        .setContentTitle("Delivery man")
-                        .setContentText(msg);
+        try{
+            NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(this)
+                            .setSmallIcon(R.drawable.ic_actionbar_ico)
+                            .setContentTitle("Delivery man")
+                            .setContentText(msg);
 
-        Intent resultIntent = new Intent(this, OrdersMapActivity.class);
+            Intent resultIntent = new Intent(this, OrdersMapActivity.class);
 
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
 
-        stackBuilder.addParentStack(OrdersMapActivity.class);
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(
-                        0,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
-        mBuilder.setContentIntent(resultPendingIntent);
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            stackBuilder.addParentStack(OrdersMapActivity.class);
+            stackBuilder.addNextIntent(resultIntent);
+            PendingIntent resultPendingIntent =
+                    stackBuilder.getPendingIntent(
+                            0,
+                            PendingIntent.FLAG_UPDATE_CURRENT
+                    );
+            mBuilder.setContentIntent(resultPendingIntent);
+            NotificationManager mNotificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        mNotificationManager.notify(mNotifyId, mBuilder.build());
+            mNotificationManager.notify(mNotifyId, mBuilder.build());
+        }catch (Exception e){e.printStackTrace();}
     }
 
     private void sendNoticeSms(){
-        String message = "Sắp tới";
-
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, OrderTracingService.class), 0);
-
-        SmsManager sms = null;
         try {
+            String message = "Đây là tin nhắn nhắc nhỡ về đơn hàng bạn đã đặt. Đơn hàng của bạn đang trên đường tới.";
+
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+                    new Intent(this, OrderTracingService.class), 0);
+
+            SmsManager sms = null;
+
             sms = SmsManager.getDefault();
             sms.sendTextMessage("0929028027", null, message, pendingIntent, null);
+            isSentSMS = true;
             sendNotification("Gỡi tin nhắn nhắc nhỡ.");
         } catch (Exception e) {
             sendNotification("Có lỗi trong quá trình gỡi sms.");

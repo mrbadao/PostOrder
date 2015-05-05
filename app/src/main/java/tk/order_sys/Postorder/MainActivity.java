@@ -13,10 +13,12 @@ import android.view.MenuItem;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import tk.order_sys.Dialogs.PostOrderDialog;
 import tk.order_sys.Fragment.LoginFragment;
 import tk.order_sys.Fragment.MainFragment;
 import tk.order_sys.HttpRequest.DeliveryCheckTokenHttpRequest;
 import tk.order_sys.HttpRequestInterface.DeliveryInterface;
+import tk.order_sys.config.appConfig;
 
 
 public class MainActivity extends ActionBarActivity implements LoginFragment.LoginInterface, MainFragment.LogoutInterface, DeliveryInterface {
@@ -35,9 +37,11 @@ public class MainActivity extends ActionBarActivity implements LoginFragment.Log
         fragmentManager = getSupportFragmentManager();
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+        if(!appConfig.isNetworkAvailable(this)){
+            PostOrderDialog.showNetworkAlertDialog(this);
+        }
+
         if (savedInstanceState == null) {
-
-
             if(mSharedPreferences != null && mSharedPreferences.contains(LoginFragment.PREF_STAFF_TOKEN_TAG) && mSharedPreferences.contains(LoginFragment.PREF_STAFF_ID_TAG)) {
                 String Token = mSharedPreferences.getString(LoginFragment.PREF_STAFF_TOKEN_TAG, null);
                 String StaffID = mSharedPreferences.getString(LoginFragment.PREF_STAFF_ID_TAG, null);
