@@ -27,12 +27,15 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Map;
 
+import tk.order_sys.Dialogs.PostOrderDialog;
 import tk.order_sys.PostOrderBroadcastReceiver.LocationReceiver;
 import tk.order_sys.PostOrderInterface.LocationReceiverInterface;
 import tk.order_sys.PostOrderService.OrderTracingService;
 
-public class OrdersMapActivity extends FragmentActivity implements LocationReceiverInterface, GoogleMap.OnMarkerClickListener {    private static String LAST_ORDER_LOCATION_TAG = "mLastOrderLocation";
+public class OrdersMapActivity extends FragmentActivity implements LocationReceiverInterface, GoogleMap.OnMarkerClickListener {
+    public static String LAST_ORDER_LOCATION_TAG = "mLastOrderLocation";
     public static String ORDER_TRACING_SERVICE_ACTION_GET_ROUTING = "OrderTracingService.action.getRouting";
+    public static String ORDER_TRACING_SERVICE_ACTION_CLOSE = "OrderTracingService.action.close";
     public static String ORDER_TRACING_SERVICE_PARAM_LAST_ORDER_LOCATION = "OrderTracingService.param.mLastOrderLocation";
 
     public static String PREF_CURRENT_LOCATION_TAG = "mCurrentLocation";
@@ -157,7 +160,7 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        if (mCurrentLocation != null) {
+//        if (mCurrentLocation != null) {
             mCurrenOrederMarkerIndex = marker.getId();
             mLastOrderLocation = marker.getPosition();
 
@@ -173,7 +176,7 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
 
                 startService(mOrderTracingService);
             }
-        }
+//        }
 
         return false;
     }
@@ -247,6 +250,11 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
 
     @Override
     public void onCurrentLocationReceived(Context context, Intent intent) {
+
+        if (intent.hasExtra(OrderTracingService.SERVICE_START_FAILED)){
+            PostOrderDialog.showAlertDialog(this, "Cảnh báo", " Ứng dụng cầnđược truy cập mạng và vị trí của bạn. Hãy kiểm tra thiết bị và thữ lại");
+            return;
+        }
 
         if (intent.hasExtra(OrderTracingService.DATA_ROUTING_FAILED)){
             mCurrenOrederMarkerIndex = null;

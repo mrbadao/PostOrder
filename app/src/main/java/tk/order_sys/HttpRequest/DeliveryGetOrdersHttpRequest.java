@@ -1,5 +1,6 @@
 package tk.order_sys.HttpRequest;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 
@@ -14,6 +15,7 @@ import tk.order_sys.HttpRequestInterface.OrdersInterface;
  * Created by mrbadao on 13/04/2015.
  */
 public class DeliveryGetOrdersHttpRequest extends AsyncTask<JSONObject, String, JSONObject> {
+    private ProgressDialog pdia;
     public OrdersInterface delegate;
     private Context context;
     private JSONArray jsonCookieStore;
@@ -26,6 +28,9 @@ public class DeliveryGetOrdersHttpRequest extends AsyncTask<JSONObject, String, 
 
     @Override
     protected void onPreExecute() {
+        pdia = new ProgressDialog(context);
+        pdia.setMessage("Loading...");
+        pdia.show();
     }
 
     @Override
@@ -35,5 +40,6 @@ public class DeliveryGetOrdersHttpRequest extends AsyncTask<JSONObject, String, 
 
     protected void onPostExecute(JSONObject jsonObject) {
         delegate.onGetOrders(jsonObject);
+        pdia.dismiss();
     }
 }

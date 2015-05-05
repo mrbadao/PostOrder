@@ -108,7 +108,7 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
             if (data.hasExtra(OrderDetailInfoFragment.CALL_BACK_ORDER_COMPLETED_FLAG)) {
                 boolean flag = data.getBooleanExtra(OrderDetailInfoFragment.CALL_BACK_ORDER_COMPLETED_FLAG, false);
                 if(flag){
-                    onRefresh();
+//                    onRefresh();
                 }
             }
         }

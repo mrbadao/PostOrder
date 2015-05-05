@@ -26,9 +26,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
 
+import tk.order_sys.Dialogs.PostOrderDialog;
 import tk.order_sys.Postorder.OrdersMapActivity;
 import tk.order_sys.Postorder.R;
 import tk.order_sys.config.Constants;
+import tk.order_sys.config.appConfig;
 
 /**
  * Created by mrbadao on 30/04/2015.
@@ -40,6 +42,7 @@ public class OrderTracingService extends Service implements LocationListener, Ro
     public static final String DATA_POLY_OPTIONS = "OrderTracingService.data.mPolyOptions";
     public static final String DATA_LAST_ORDER_LOCATION = "OrderTracingService.data.mLastOrderLocation";
     public static final String DATA_ROUTING_FAILED = "OrderTracingService.data.mRoutingFailed";
+    public static final String SERVICE_START_FAILED = "OrderTracingService.data.startfailed";
 
     private static String PREF_CURRENT_LOCATION_TAG = "mCurrentLocation";
 
@@ -55,6 +58,7 @@ public class OrderTracingService extends Service implements LocationListener, Ro
     private boolean isSendNoticeSms;
     private int distanceSendNoticeSms;
     private boolean isSentSMS = true;
+    private String mPhonenumber;
 
     private int mNotifyId = 104;
     @Override
@@ -66,8 +70,6 @@ public class OrderTracingService extends Service implements LocationListener, Ro
         mTravelMode = Routing.TravelMode.DRIVING;
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        mProvider = locationManager.getBestProvider(criteria, true);
     }
 
     @Override
@@ -77,12 +79,21 @@ public class OrderTracingService extends Service implements LocationListener, Ro
         String intentAction = intent.getAction();
 
         if(intentAction.equals(OrdersMapActivity.ORDER_TRACING_SERVICE_ACTION_GET_ROUTING)) {
-//          Get Lastorder location
+            Criteria criteria = new Criteria();
+            mProvider = locationManager.getBestProvider(criteria, true);
+
+            if(!appConfig.isNetworkAvailable(getApplicationContext()) || mProvider.isEmpty()){
+                Intent intentAlert =  new Intent(BROADCAST_ACTION).putExtra(SERVICE_START_FAILED, true);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(intentAlert);
+                stopSelf();
+            }
+            
+            //Get Lastorder location
             if (intent.hasExtra(OrdersMapActivity.ORDER_TRACING_SERVICE_PARAM_LAST_ORDER_LOCATION)) {
                 Gson gson = new Gson();
                 mLastOrderLocation = gson.fromJson(intent.getStringExtra(OrdersMapActivity.ORDER_TRACING_SERVICE_PARAM_LAST_ORDER_LOCATION), LatLng.class);
             }
-//          Toast.makeText(getApplicationContext(), intentAction, Toast.LENGTH_SHORT).show();
+
             // Setup locationManager
             locationManager.requestLocationUpdates(mProvider, mGpsUpdateMinTime, mGpsUpdateMinDistance, this);
             Location location = locationManager.getLastKnownLocation(mProvider);
@@ -103,6 +114,12 @@ public class OrderTracingService extends Service implements LocationListener, Ro
                 }
             }
         }
+
+        if (intentAction.equals(OrdersMapActivity.ORDER_TRACING_SERVICE_ACTION_CLOSE)){
+            saveCurrentLocation();
+            stopSelf();
+        }
+
         return START_STICKY;
     }
 
@@ -278,5 +295,21 @@ public class OrderTracingService extends Service implements LocationListener, Ro
             sendNotification("Có lỗi trong quá trình gỡi sms.");
             e.printStackTrace();
         }
+    }
+
+    public void saveCurrentLocation() {
+        SharedPreferences mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        if (mSharedPreferences == null) return;
+
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        Gson gson = new Gson();
+
+        if (mCurrentLocation != null) {
+            String jsonCurrentLocation = gson.toJson(mCurrentLocation);
+            editor.putString(PREF_CURRENT_LOCATION_TAG, jsonCurrentLocation);
+        }
+
+        editor.commit();
     }
 }

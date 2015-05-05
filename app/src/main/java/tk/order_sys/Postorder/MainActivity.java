@@ -108,6 +108,10 @@ public class MainActivity extends ActionBarActivity implements LoginFragment.Log
 
     @Override
     public void onLogoutSuccess() {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.clear();
+        editor.commit();
+
         fragmentManager.beginTransaction()
                 .replace(R.id.container, new LoginFragment())
                 .commit();

@@ -15,12 +15,17 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.Gson;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import tk.order_sys.HttpRequest.DeliveryCompleteOrderHttpRequest;
 import tk.order_sys.HttpRequestInterface.OrderActionInterface;
+import tk.order_sys.PostOrderService.OrderTracingService;
 import tk.order_sys.Postorder.OrderDetailActivity;
+import tk.order_sys.Postorder.OrdersMapActivity;
 import tk.order_sys.Postorder.R;
 
 /**
@@ -164,6 +169,44 @@ public class OrderDetailInfoFragment extends Fragment implements View.OnClickLis
                         if (sharedPreferences.contains(mPrefsTag + "detail")) {
                             editor.remove(mPrefsTag + "detail");
                         }
+
+                        String lat = null;
+
+                        if (sharedPreferences.contains(mPrefsTag + "coordinate_lat")) {
+                            lat = sharedPreferences.getString(mPrefsTag + "coordinate_lat", null);
+                            editor.remove(mPrefsTag + "detail");
+                        }
+
+                        String lng = null;
+                        if (sharedPreferences.contains(mPrefsTag + "coordinate_long")) {
+                            editor.remove(mPrefsTag + "detail");
+                            lng = sharedPreferences.getString(mPrefsTag + "coordinate_long", null);
+                        }
+
+                        if (sharedPreferences.contains(mPrefsTag + "delivery_id")) {
+                            editor.remove(mPrefsTag + "detail");
+                        }
+
+                        if (sharedPreferences.contains(mPrefsTag + "status")) {
+                            editor.remove(mPrefsTag + "detail");
+                        }
+
+                        if (sharedPreferences.contains(mPrefsTag + "created")) {
+                            editor.remove(mPrefsTag + "detail");
+                        }
+
+                        if(sharedPreferences.contains(OrdersMapActivity.LAST_ORDER_LOCATION_TAG)){
+                            Gson gson = new Gson();
+                            LatLng latLng = gson.fromJson(sharedPreferences.getString(OrdersMapActivity.LAST_ORDER_LOCATION_TAG, null), LatLng.class);
+                            if(String.valueOf(latLng.latitude).equals(lat) && String.valueOf(latLng.longitude).equals(lng)){
+                                editor.remove(OrdersMapActivity.LAST_ORDER_LOCATION_TAG);
+
+                                Intent mOrderTracingService = new Intent(getActivity(), OrderTracingService.class);
+                                mOrderTracingService.setAction(OrdersMapActivity.ORDER_TRACING_SERVICE_ACTION_CLOSE);
+                                getActivity().startService(mOrderTracingService);
+                            }
+                        }
+
 
                         editor.commit();
 
