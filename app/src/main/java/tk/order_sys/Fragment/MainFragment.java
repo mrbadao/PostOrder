@@ -1,6 +1,7 @@
 package tk.order_sys.Fragment;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -112,7 +113,7 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
             if (data.hasExtra(OrderDetailInfoFragment.CALL_BACK_ORDER_COMPLETED_FLAG)) {
                 boolean flag = data.getBooleanExtra(OrderDetailInfoFragment.CALL_BACK_ORDER_COMPLETED_FLAG, false);
                 if (flag) {
-//                    onRefresh();
+                    isFirstLoad = true;
                 }
             }
         }
@@ -121,8 +122,6 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
     }
 
     private void getOrders() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
         if (token != null && staff_id != null) {
             JSONObject params = new JSONObject();
             try {
@@ -218,6 +217,7 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
                                 jsonOrder.getString("delivery_id"),
                                 jsonOrder.getString("status"),
                                 jsonOrder.getString("created"),
+                                jsonOrder.getString("completed"),
                                 jsonOrder.getString("completed")
                         );
                         Log.i("Item:", item.toString());
@@ -234,6 +234,7 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
                             editor.putString(PrefsTag + "delivery_id", item.delivery_id);
                             editor.putString(PrefsTag + "status", item.status);
                             editor.putString(PrefsTag + "created", item.created);
+                            editor.putString(PrefsTag + "address", item.created);
 
                         }
 

@@ -138,7 +138,7 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
-            mMap.setPadding(0, 55, 0, 0);
+            mMap.setPadding(0, 60, 0, 0);
 
             if (mMap != null) {
                 loadSavedData();

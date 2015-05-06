@@ -17,13 +17,14 @@ public class ContentOrder implements Parcelable {
     public String status;
     public String created;
     public String completed;
+    public String address;
 
     public ContentOrder() {
-        id = name = customer_name = order_phone = coordinate_lat = coordinate_long = delivery_id = status = completed = created = null;
+        id = name = customer_name = order_phone = coordinate_lat = coordinate_long = delivery_id = status = completed = created = address= null;
     }
 
     public ContentOrder(String id, String name, String customer_name, String order_phone, String coordinate_lat,
-                        String coordinate_long, String delivery_id, String status, String created, String completed) {
+                        String coordinate_long, String delivery_id, String status, String created, String completed, String address) {
         this.id = id;
         this.name = name;
         this.customer_name = customer_name;
@@ -34,6 +35,7 @@ public class ContentOrder implements Parcelable {
         this.status = status;
         this.completed = completed;
         this.created = created;
+        this.address = address;
     }
 
     @Override

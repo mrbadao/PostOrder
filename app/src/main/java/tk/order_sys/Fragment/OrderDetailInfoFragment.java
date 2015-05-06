@@ -110,9 +110,9 @@ public class OrderDetailInfoFragment extends Fragment implements View.OnClickLis
             txtOrderDetailInfoPhone.setText(mPhoneNumber);
         }
 
-//        if(sharedPreferences.contains(PrefsTag + "order_address")){
-//            txtOrderDetailInfoOrderName.setText("MS: " +  sharedPreferences.getString(PrefsTag + "order_address", null));
-//        }
+        if(sharedPreferences.contains(mPrefsTag + "address")){
+            txtOrderDetailInfoAddress.setText("MS: " +  sharedPreferences.getString(mPrefsTag + "address", null));
+        }
     }
 
     @Override
@@ -214,6 +214,8 @@ public class OrderDetailInfoFragment extends Fragment implements View.OnClickLis
                             LatLng latLng = gson.fromJson(sharedPreferences.getString(OrdersMapActivity.LAST_ORDER_LOCATION_TAG, null), LatLng.class);
                             if (String.valueOf(latLng.latitude).equals(lat) && String.valueOf(latLng.longitude).equals(lng)) {
                                 editor.remove(OrdersMapActivity.LAST_ORDER_LOCATION_TAG);
+                                editor.remove(OrdersMapActivity.PREF_CURRENT_PHONE_NUMBER_TAG);
+                                editor.remove(OrdersMapActivity.PREF_CURRENT_ORDER_NAME_TAG);
 
                                 Intent mOrderTracingService = new Intent(getActivity(), OrderTracingService.class);
                                 mOrderTracingService.setAction(OrdersMapActivity.ORDER_TRACING_SERVICE_ACTION_CLOSE);
