@@ -40,6 +40,8 @@ public class OrderTracingService extends Service implements LocationListener, Ro
     public static final String DATA_ROUTING = "OrderTracingService.data.route";
     public static final String DATA_POLY_OPTIONS = "OrderTracingService.data.mPolyOptions";
     public static final String DATA_LAST_ORDER_LOCATION = "OrderTracingService.data.mLastOrderLocation";
+    public static final String DATA_LAST_ORDER_NAME = "OrderTracingService.data.mOrderName";
+    public static final String DATA_LAST_PHONE_NUMBER = "OrderTracingService.data.mPhoneNumber";
     public static final String DATA_ROUTING_FAILED = "OrderTracingService.data.mRoutingFailed";
     public static final String SERVICE_START_FAILED = "OrderTracingService.data.startfailed";
 
@@ -57,7 +59,8 @@ public class OrderTracingService extends Service implements LocationListener, Ro
     private boolean isSendNoticeSms;
     private int distanceSendNoticeSms;
     private boolean isSentSMS = true;
-    private String mPhonenumber;
+    private String mPhoneNumber;
+    private String mOrderName;
 
     private int mNotifyId = 104;
 
@@ -67,6 +70,9 @@ public class OrderTracingService extends Service implements LocationListener, Ro
 
         mCurrentLocation = null;
         mLastOrderLocation = null;
+        mPhoneNumber = null;
+        mOrderName = null;
+
         mTravelMode = Routing.TravelMode.DRIVING;
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -92,6 +98,16 @@ public class OrderTracingService extends Service implements LocationListener, Ro
             if (intent.hasExtra(OrdersMapActivity.ORDER_TRACING_SERVICE_PARAM_LAST_ORDER_LOCATION)) {
                 Gson gson = new Gson();
                 mLastOrderLocation = gson.fromJson(intent.getStringExtra(OrdersMapActivity.ORDER_TRACING_SERVICE_PARAM_LAST_ORDER_LOCATION), LatLng.class);
+            }
+
+            //Get mOrderName
+            if(intent.hasExtra(OrdersMapActivity.ORDER_TRACING_SERVICE_PARAM_ORDER_NAME)){
+                mOrderName = intent.getStringExtra(OrdersMapActivity.ORDER_TRACING_SERVICE_PARAM_ORDER_NAME);
+            }
+
+            //Get mOrderName
+            if(intent.hasExtra(OrdersMapActivity.ORDER_TRACING_SERVICE_PARAM_PHONE_NUMBER)){
+                mPhoneNumber = intent.getStringExtra(OrdersMapActivity.ORDER_TRACING_SERVICE_PARAM_PHONE_NUMBER);
             }
 
             // Setup locationManager
@@ -214,6 +230,8 @@ public class OrderTracingService extends Service implements LocationListener, Ro
             localIntent.putExtra(DATA_POLY_OPTIONS, jsonPolyOptions);
             localIntent.putExtra(DATA_ROUTING, jsonRoute);
             localIntent.putExtra(DATA_LAST_ORDER_LOCATION, jsonLastOrderLocation);
+            localIntent.putExtra(DATA_LAST_ORDER_NAME, mOrderName);
+            localIntent.putExtra(DATA_LAST_PHONE_NUMBER, mPhoneNumber);
 
             LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
         }
@@ -282,7 +300,7 @@ public class OrderTracingService extends Service implements LocationListener, Ro
 
     private void sendNoticeSms() {
         try {
-            String message = "Đây là tin nhắn nhắc nhỡ về đơn hàng bạn đã đặt. Đơn hàng của bạn đang trên đường tới.";
+            String message = "Đây là tin nhắn nhắc nhỡ về đơn hàng " + mOrderName + " bạn đã đặt. Đơn hàng của bạn đang trên đường tới.";
 
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
                     new Intent(this, OrderTracingService.class), 0);
@@ -290,11 +308,11 @@ public class OrderTracingService extends Service implements LocationListener, Ro
             SmsManager sms = null;
 
             sms = SmsManager.getDefault();
-            sms.sendTextMessage("0929028027", null, message, pendingIntent, null);
+            sms.sendTextMessage(mPhoneNumber, null, message, pendingIntent, null);
             isSentSMS = true;
-            sendNotification("Gỡi tin nhắn nhắc nhỡ.");
+            sendNotification("Gỡi tin nhắn nhắc nhỡ đơn hàng " + mOrderName);
         } catch (Exception e) {
-            sendNotification("Có lỗi trong quá trình gỡi sms.");
+            sendNotification("Có lỗi trong quá trình gỡi sms nhắc nhỡ đơn hàng " + mOrderName);
             e.printStackTrace();
         }
     }

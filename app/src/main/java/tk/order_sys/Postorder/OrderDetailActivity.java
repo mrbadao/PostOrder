@@ -24,6 +24,7 @@ public class OrderDetailActivity extends ActionBarActivity implements ActionBar.
 
     private String orderId;
     private String phoneNumber;
+    private String orderName;
 
     ViewPager mViewPager;
 
@@ -32,6 +33,8 @@ public class OrderDetailActivity extends ActionBarActivity implements ActionBar.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_detail);
         orderId = null;
+        phoneNumber = null;
+        orderName = null;
 
         Intent intent = getIntent();
 
@@ -41,6 +44,10 @@ public class OrderDetailActivity extends ActionBarActivity implements ActionBar.
 
         if(intent.hasExtra("phoneNumber")){
             phoneNumber = intent.getStringExtra("phoneNumber");
+        }
+
+        if(intent.hasExtra("orderName")){
+            orderName = intent.getStringExtra("orderName");
         }
 
         // Set up the action bar.
@@ -105,6 +112,15 @@ public class OrderDetailActivity extends ActionBarActivity implements ActionBar.
                     LatLng latLng = new LatLng(lat, lng);
                     intentOrdersMap.putExtra(OrdersMapActivity.PREF_LAST_ORDER_LOCATION_TAG, gson.toJson(latLng).toString());
                 }
+
+                if(orderName != null){
+                    intentOrdersMap.putExtra(OrdersMapActivity.PREF_CURRENT_ORDER_NAME_TAG, orderName);
+                }
+
+                if(phoneNumber != null){
+                    intentOrdersMap.putExtra(OrdersMapActivity.PREF_CURRENT_PHONE_NUMBER_TAG, phoneNumber);
+                }
+
                 startActivityForResult(intentOrdersMap, ORDERS_MAPS_ACTIVITY_CODE);
 
                 return true;

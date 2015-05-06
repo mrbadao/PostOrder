@@ -37,8 +37,12 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
     public static String ORDER_TRACING_SERVICE_ACTION_GET_ROUTING = "OrderTracingService.action.getRouting";
     public static String ORDER_TRACING_SERVICE_ACTION_CLOSE = "OrderTracingService.action.close";
     public static String ORDER_TRACING_SERVICE_PARAM_LAST_ORDER_LOCATION = "OrderTracingService.param.mLastOrderLocation";
+    public static String ORDER_TRACING_SERVICE_PARAM_ORDER_NAME = "OrderTracingService.param.mOrderName";
+    public static String ORDER_TRACING_SERVICE_PARAM_PHONE_NUMBER = "OrderTracingService.param.mPhoneNumber";
 
     public static String PREF_CURRENT_LOCATION_TAG = "mCurrentLocation";
+    public static String PREF_CURRENT_PHONE_NUMBER_TAG = "mPhoneNumber";
+    public static String PREF_CURRENT_ORDER_NAME_TAG = "mOrderName";
     public static String PREF_LAST_ORDER_LOCATION_TAG = "mLastOrderLocation";
 
     private static int MAP_ZOOM_DEFAULT = 12;
@@ -49,14 +53,18 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
     private TextView txtStatus;
     private ArrayList<Marker> mOrderMarkersArrayList;
     private String mCurrenOrederMarkerIndex;
+    Polyline mRoutingLastPolyLine;
 
     private Routing.TravelMode mTravelMode;
 
     SharedPreferences mSharedPreferences = null;
+    LocationReceiver mCurrentLocationReceiver;
+
     LatLng mCurrentLocation;
     LatLng mLastOrderLocation;
-    Polyline mRoutingLastPolyLine;
-    LocationReceiver mCurrentLocationReceiver;
+    String mPhoneNumber;
+    String mOrderName;
+
 
 
     @Override
@@ -69,6 +77,8 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
         mCurrentLocation = null;
         mRoutingLastPolyLine = null;
         mLastOrderLocation = null;
+        mPhoneNumber= null;
+        mOrderName = null;
         mCurrenOrederMarkerIndex = null;
         mTravelMode = Routing.TravelMode.DRIVING;
         mOrderMarkersArrayList = new ArrayList<Marker>();
@@ -83,6 +93,14 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
                 Gson gson = new Gson();
                 mLastOrderLocation = gson.fromJson(jsonLastOrderLocation, LatLng.class);
             }
+        }
+
+        if(intent.hasExtra(PREF_CURRENT_ORDER_NAME_TAG)){
+            mOrderName = intent.getStringExtra(PREF_CURRENT_ORDER_NAME_TAG);
+        }
+
+        if(intent.hasExtra(PREF_CURRENT_PHONE_NUMBER_TAG)){
+            mPhoneNumber = intent.getStringExtra(PREF_CURRENT_PHONE_NUMBER_TAG);
         }
 
         IntentFilter mLocationIntentFilter = new IntentFilter(OrderTracingService.BROADCAST_ACTION);
@@ -120,7 +138,7 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
-            mMap.setPadding(0, 50, 0, 0);
+            mMap.setPadding(0, 55, 0, 0);
 
             if (mMap != null) {
                 loadSavedData();
@@ -132,6 +150,14 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
                     Gson gson = new Gson();
                     String jsonLastOrderLocation = gson.toJson(mLastOrderLocation);
                     mOrderTracingService.putExtra(ORDER_TRACING_SERVICE_PARAM_LAST_ORDER_LOCATION, jsonLastOrderLocation);
+                }
+
+                if(mOrderName != null){
+                    mOrderTracingService.putExtra(ORDER_TRACING_SERVICE_PARAM_ORDER_NAME, mOrderName);
+                }
+
+                if(mPhoneNumber != null){
+                    mOrderTracingService.putExtra(ORDER_TRACING_SERVICE_PARAM_PHONE_NUMBER, mPhoneNumber);
                 }
 
                 startService(mOrderTracingService);
@@ -151,10 +177,10 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
         addOrderMarkers();
 
         if (mCurrentLocation != null) {
-            if (mLastOrderLocation == null) {
+//            if (mLastOrderLocation == null) {
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(mCurrentLocation));
                 mMap.animateCamera(CameraUpdateFactory.zoomTo(MAP_MY_LOCATION_ZOOM_DEFAULT));
-            }
+//            }
         }
     }
 
@@ -164,17 +190,27 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
         mCurrenOrederMarkerIndex = marker.getId();
         mLastOrderLocation = marker.getPosition();
 
-        if (mSharedPreferences != null && mLastOrderLocation != null) {
-            Intent mOrderTracingService = new Intent(OrdersMapActivity.this, OrderTracingService.class);
-            mOrderTracingService.setAction(ORDER_TRACING_SERVICE_ACTION_GET_ROUTING);
+        Intent mOrderTracingService = new Intent(OrdersMapActivity.this, OrderTracingService.class);
+        mOrderTracingService.setAction(ORDER_TRACING_SERVICE_ACTION_GET_ROUTING);
 
+        if (mLastOrderLocation != null) {
             Gson gson = new Gson();
-
             String jsonLastOrderLocation = gson.toJson(mLastOrderLocation);
             mOrderTracingService.putExtra(ORDER_TRACING_SERVICE_PARAM_LAST_ORDER_LOCATION, jsonLastOrderLocation);
 
-            startService(mOrderTracingService);
+
         }
+
+        if(mOrderName != null){
+            mOrderTracingService.putExtra(ORDER_TRACING_SERVICE_PARAM_ORDER_NAME, mOrderName);
+        }
+
+        if(mPhoneNumber != null){
+            mOrderTracingService.putExtra(ORDER_TRACING_SERVICE_PARAM_PHONE_NUMBER, mPhoneNumber);
+        }
+
+        startService(mOrderTracingService);
+
 //        }
 
         return false;
@@ -233,6 +269,14 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
             editor.putString(PREF_CURRENT_LOCATION_TAG, jsonCurrentLocation);
         }
 
+        if(mOrderName != null){
+            editor.putString(PREF_CURRENT_ORDER_NAME_TAG, mOrderName);
+        }
+
+        if(mPhoneNumber != null){
+            editor.putString(PREF_CURRENT_PHONE_NUMBER_TAG, mPhoneNumber);
+        }
+
         editor.commit();
     }
 
@@ -240,9 +284,16 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
         if (mSharedPreferences == null) return;
 
         Gson gson = new Gson();
-        if (mSharedPreferences.contains(LAST_ORDER_LOCATION_TAG) && mLastOrderLocation == null) {
-            String jsonLastOrderLocation = mSharedPreferences.getString(LAST_ORDER_LOCATION_TAG, null);
+        if (mSharedPreferences.contains(PREF_LAST_ORDER_LOCATION_TAG) && mLastOrderLocation == null) {
+            String jsonLastOrderLocation = mSharedPreferences.getString(PREF_LAST_ORDER_LOCATION_TAG, null);
             mLastOrderLocation = gson.fromJson(jsonLastOrderLocation, LatLng.class);
+        }
+
+        if (mSharedPreferences.contains(PREF_CURRENT_ORDER_NAME_TAG) && mOrderName == null) {
+            mOrderName = mSharedPreferences.getString(PREF_CURRENT_ORDER_NAME_TAG, null);
+        }
+        if (mSharedPreferences.contains(PREF_CURRENT_PHONE_NUMBER_TAG) && mPhoneNumber == null) {
+            mPhoneNumber = mSharedPreferences.getString(PREF_CURRENT_PHONE_NUMBER_TAG, null);
         }
     }
 
@@ -278,8 +329,16 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
             mPolyOptions = gson.fromJson(intent.getStringExtra(OrderTracingService.DATA_POLY_OPTIONS), PolylineOptions.class);
         }
 
-        if (intent.hasExtra(OrderTracingService.DATA_LOCATION)) {
+        if (intent.hasExtra(OrderTracingService.DATA_LAST_ORDER_LOCATION)) {
             mLastOrderLocation = gson.fromJson(intent.getStringExtra(OrderTracingService.DATA_LAST_ORDER_LOCATION), LatLng.class);
+        }
+
+        if (intent.hasExtra(OrderTracingService.DATA_LAST_ORDER_NAME)) {
+            mOrderName = intent.getStringExtra(OrderTracingService.DATA_LAST_ORDER_NAME);
+        }
+
+        if (intent.hasExtra(OrderTracingService.DATA_LAST_PHONE_NUMBER)) {
+            mPhoneNumber = intent.getStringExtra(OrderTracingService.DATA_LAST_PHONE_NUMBER);
         }
 
         if (route != null && mPolyOptions != null) {
@@ -304,7 +363,7 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
                 }
             }
 
-            txtStatus.setText("Khoảng cách: " + route.getDistanceText() + "\n" + "Thời gian dự tính: " + route.getDurationText());
+            txtStatus.setText(mOrderName + "\nKhoảng cách: " + route.getDistanceText() + "\n" + "Thời gian dự tính: " + route.getDurationText());
         }
         mMap.moveCamera(CameraUpdateFactory.newLatLng(mCurrentLocation));
     }

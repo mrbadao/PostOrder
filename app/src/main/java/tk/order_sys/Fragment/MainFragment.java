@@ -89,10 +89,12 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String orderId = listOrders.get(position - 1).id;
                 String phoneNumber = listOrders.get(position - 1).order_phone;
-                if (orderId != null && !orderId.isEmpty() && phoneNumber != null && !phoneNumber.isEmpty()) {
+                String orderName = listOrders.get(position - 1).name;
+                if (orderId != null && !orderId.isEmpty() && phoneNumber != null && !phoneNumber.isEmpty() && orderName != null) {
                     Intent intentOrderDetail = new Intent(getActivity().getApplicationContext(), OrderDetailActivity.class);
                     intentOrderDetail.putExtra("orderId", orderId);
                     intentOrderDetail.putExtra("phoneNumber", phoneNumber);
+                    intentOrderDetail.putExtra("orderName", orderName);
                     startActivityForResult(intentOrderDetail, ORDERS_DETAIL_ACTIVITY_CODE);
                 }
             }
