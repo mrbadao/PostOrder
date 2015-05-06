@@ -188,25 +188,29 @@ public class OrderDetailInfoFragment extends Fragment implements View.OnClickLis
 
                         if (sharedPreferences.contains(mPrefsTag + "coordinate_lat")) {
                             lat = sharedPreferences.getString(mPrefsTag + "coordinate_lat", null);
-                            editor.remove(mPrefsTag + "detail");
+                            editor.remove(mPrefsTag + "coordinate_lat");
                         }
 
                         String lng = null;
                         if (sharedPreferences.contains(mPrefsTag + "coordinate_long")) {
-                            editor.remove(mPrefsTag + "detail");
+                            editor.remove(mPrefsTag + "coordinate_long");
                             lng = sharedPreferences.getString(mPrefsTag + "coordinate_long", null);
                         }
 
                         if (sharedPreferences.contains(mPrefsTag + "delivery_id")) {
-                            editor.remove(mPrefsTag + "detail");
+                            editor.remove(mPrefsTag + "delivery_id");
                         }
 
                         if (sharedPreferences.contains(mPrefsTag + "status")) {
-                            editor.remove(mPrefsTag + "detail");
+                            editor.remove(mPrefsTag + "status");
                         }
 
                         if (sharedPreferences.contains(mPrefsTag + "created")) {
-                            editor.remove(mPrefsTag + "detail");
+                            editor.remove(mPrefsTag + "created");
+                        }
+
+                        if (sharedPreferences.contains(mPrefsTag + "address")) {
+                            editor.remove(mPrefsTag + "address");
                         }
 
                         if (sharedPreferences.contains(OrdersMapActivity.LAST_ORDER_LOCATION_TAG)) {

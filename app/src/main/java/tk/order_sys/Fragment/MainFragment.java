@@ -155,7 +155,7 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
                 pages = 0;
                 listOrders.clear();
                 getOrders();
-                xListViewOrders.setAdapter(mAdapter);
+                isFirstLoad = true;
                 onLoad();
             }
         }, 2000);
@@ -169,7 +169,6 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
                 page++;
                 if (page <= pages && pages != 0) {
                     getOrders();
-                    mAdapter.notifyDataSetChanged();
                     onLoad();
                 } else {
                     xListViewOrders.stopLoadMore();
@@ -245,6 +244,7 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
 
                     if (listOrders.size() > 0) {
                         if (isFirstLoad) {
+                            mAdapter = null;
                             mAdapter = new OrdersAdapter(getActivity(), R.layout.orders_list_item, listOrders);
                             xListViewOrders.setAdapter(mAdapter);
                             xListViewOrders.setXListViewListener(this);
