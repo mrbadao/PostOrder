@@ -1,7 +1,6 @@
 package tk.order_sys.Fragment;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -107,13 +106,18 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == Activity.RESULT_OK && (requestCode == ORDERS_DETAIL_ACTIVITY_CODE)) {
             if (data.hasExtra(OrderDetailInfoFragment.CALL_BACK_ORDER_COMPLETED_FLAG)) {
                 boolean flag = data.getBooleanExtra(OrderDetailInfoFragment.CALL_BACK_ORDER_COMPLETED_FLAG, false);
                 if (flag) {
                     isFirstLoad = true;
+                    xListViewOrders.setAdapter(null);
+                    mAdapter = null;
+                    page = 1;
+                    pages = 0;
+                    listOrders.clear();
+                    getOrders();
                 }
             }
         }
@@ -217,9 +221,10 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
                                 jsonOrder.getString("status"),
                                 jsonOrder.getString("created"),
                                 jsonOrder.getString("completed"),
-                                jsonOrder.getString("completed")
+                                jsonOrder.getString("customer_address")
                         );
                         Log.i("Item:", item.toString());
+                        Log.i("address:", jsonOrder.getString("customer_address"));
 
                         if (!sharedPreferences.contains(PREFS_ORDER_TAG + "." + item.id)) {
                             PrefsTag = PREFS_ORDER_TAG + "." + item.id + ".";
@@ -233,7 +238,7 @@ public class MainFragment extends Fragment implements XListView.IXListViewListen
                             editor.putString(PrefsTag + "delivery_id", item.delivery_id);
                             editor.putString(PrefsTag + "status", item.status);
                             editor.putString(PrefsTag + "created", item.created);
-                            editor.putString(PrefsTag + "address", item.created);
+                            editor.putString(PrefsTag + "address", item.address);
 
                         }
 

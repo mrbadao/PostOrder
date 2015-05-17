@@ -36,12 +36,15 @@ public class MainActivity extends ActionBarActivity implements LoginFragment.Log
 
         fragmentManager = getSupportFragmentManager();
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if(savedInstanceState == null){
+            Init();
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Init();
+
     }
 
     private void Init() {
@@ -148,6 +151,10 @@ public class MainActivity extends ActionBarActivity implements LoginFragment.Log
             }
         } else {
             fragment = new LoginFragment();
+        }
+
+        for(int i = 0; i < fragmentManager.getBackStackEntryCount(); ++i) {
+            fragmentManager.popBackStack();
         }
 
         fragmentManager.beginTransaction()

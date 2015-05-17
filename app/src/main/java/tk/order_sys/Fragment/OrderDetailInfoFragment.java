@@ -111,7 +111,7 @@ public class OrderDetailInfoFragment extends Fragment implements View.OnClickLis
         }
 
         if(sharedPreferences.contains(mPrefsTag + "address")){
-            txtOrderDetailInfoAddress.setText("MS: " +  sharedPreferences.getString(mPrefsTag + "address", null));
+            txtOrderDetailInfoAddress.setText("Địa chỉ: " +  sharedPreferences.getString(mPrefsTag + "address", null));
         }
     }
 

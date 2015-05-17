@@ -187,29 +187,29 @@ public class OrdersMapActivity extends FragmentActivity implements LocationRecei
     @Override
     public boolean onMarkerClick(Marker marker) {
 //        if (mCurrentLocation != null) {
-        mCurrenOrederMarkerIndex = marker.getId();
-        mLastOrderLocation = marker.getPosition();
-
-        Intent mOrderTracingService = new Intent(OrdersMapActivity.this, OrderTracingService.class);
-        mOrderTracingService.setAction(ORDER_TRACING_SERVICE_ACTION_GET_ROUTING);
-
-        if (mLastOrderLocation != null) {
-            Gson gson = new Gson();
-            String jsonLastOrderLocation = gson.toJson(mLastOrderLocation);
-            mOrderTracingService.putExtra(ORDER_TRACING_SERVICE_PARAM_LAST_ORDER_LOCATION, jsonLastOrderLocation);
-
-
-        }
-
-        if(mOrderName != null){
-            mOrderTracingService.putExtra(ORDER_TRACING_SERVICE_PARAM_ORDER_NAME, mOrderName);
-        }
-
-        if(mPhoneNumber != null){
-            mOrderTracingService.putExtra(ORDER_TRACING_SERVICE_PARAM_PHONE_NUMBER, mPhoneNumber);
-        }
-
-        startService(mOrderTracingService);
+//        mCurrenOrederMarkerIndex = marker.getId();
+//        mLastOrderLocation = marker.getPosition();
+//
+//        Intent mOrderTracingService = new Intent(OrdersMapActivity.this, OrderTracingService.class);
+//        mOrderTracingService.setAction(ORDER_TRACING_SERVICE_ACTION_GET_ROUTING);
+//
+//        if (mLastOrderLocation != null) {
+//            Gson gson = new Gson();
+//            String jsonLastOrderLocation = gson.toJson(mLastOrderLocation);
+//            mOrderTracingService.putExtra(ORDER_TRACING_SERVICE_PARAM_LAST_ORDER_LOCATION, jsonLastOrderLocation);
+//
+//
+//        }
+//
+//        if(mOrderName != null){
+//            mOrderTracingService.putExtra(ORDER_TRACING_SERVICE_PARAM_ORDER_NAME, mOrderName);
+//        }
+//
+//        if(mPhoneNumber != null){
+//            mOrderTracingService.putExtra(ORDER_TRACING_SERVICE_PARAM_PHONE_NUMBER, mPhoneNumber);
+//        }
+//
+//        startService(mOrderTracingService);
 
 //        }
 

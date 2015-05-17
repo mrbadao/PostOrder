@@ -42,7 +42,7 @@ public class ContentOrder implements Parcelable {
     public String toString() {
         return "id: " + id + "; name: " + name + "; customer_name: " + customer_name +
                 "; order_phone: " + order_phone + "; coordinate_lat: " + coordinate_lat + "; coordinate_long: " + coordinate_long +
-                "; delivery_id: " + delivery_id + "; status: " + status + "; created: " + created + "; completed: " + completed;
+                "; delivery_id: " + delivery_id + "; status: " + status + "; created: " + created + "; completed: " + completed + "; address: " + address;
     }
 
     @Override
