@@ -17,6 +17,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.gsm.SmsManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.directions.route.Route;
@@ -237,7 +238,7 @@ public class OrderTracingService extends Service implements LocationListener, Ro
             LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
         }
 
-        if (!isSentSMS && isSendNoticeSms && distanceSendNoticeSms >= route.getLength()) {
+        if (checkSentSms(mOrderName) == false && isSendNoticeSms && distanceSendNoticeSms >= route.getLength()) {
             sendNoticeSms();
         }
     }
@@ -307,10 +308,10 @@ public class OrderTracingService extends Service implements LocationListener, Ro
                     new Intent(this, OrderTracingService.class), 0);
 
             SmsManager sms = null;
-
+            Log.i("Phone", mPhoneNumber);
             sms = SmsManager.getDefault();
             sms.sendTextMessage(mPhoneNumber, null, message, pendingIntent, null);
-            isSentSMS = true;
+            saveSentSms(mOrderName);
             sendNotification("Gỡi tin nhắn nhắc nhỡ đơn hàng " + mOrderName);
         } catch (Exception e) {
             sendNotification("Có lỗi trong quá trình gỡi sms nhắc nhỡ đơn hàng " + mOrderName);
@@ -333,4 +334,29 @@ public class OrderTracingService extends Service implements LocationListener, Ro
 
         editor.commit();
     }
+
+    public void saveSentSms(String mOrderName) {
+        SharedPreferences mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String Tag = "IS_SENT_SMS_" + mOrderName;
+
+        if (mSharedPreferences == null) return;
+
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        Gson gson = new Gson();
+
+        editor.putString(Tag, "1");
+
+        editor.commit();
+    }
+
+    private boolean checkSentSms(String mOrderName) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String Tag = "IS_SENT_SMS_" + mOrderName;
+
+        if (sharedPreferences.contains(Tag)) {
+            return true;
+        }
+        return  false;
+    }
+
 }
