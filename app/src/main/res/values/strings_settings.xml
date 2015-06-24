@@ -39,7 +39,7 @@
     <string name="settings_SEND_NOTICE_SMS_DISTANCE_title">Khoảng cách gữi sms</string>
 
     <string-array name="settings_SEND_NOTICE_SMS_list_titles">
-        <item>500 km</item>
+        <item>500 m</item>
         <item>1 km</item>
         <item>2 km</item>
     </string-array>

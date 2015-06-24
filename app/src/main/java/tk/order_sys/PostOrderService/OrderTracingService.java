@@ -81,7 +81,7 @@ public class OrderTracingService extends Service implements LocationListener, Ro
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         loadAppSetting();
-
+        isSentSMS = false;
         String intentAction = intent.getAction();
 
         if (intentAction.equals(OrdersMapActivity.ORDER_TRACING_SERVICE_ACTION_GET_ROUTING)) {
@@ -124,7 +124,7 @@ public class OrderTracingService extends Service implements LocationListener, Ro
             if (mCurrentLocation != null) {
                 if (mLastOrderLocation != null) {
                     getRouting(mCurrentLocation, mLastOrderLocation, mTravelMode);
-                    isSentSMS = false;
+//                    isSentSMS = false;
                 } else {
                     reportLocation();
                 }
@@ -199,6 +199,7 @@ public class OrderTracingService extends Service implements LocationListener, Ro
         if (mSharedPreferences.contains(PREF_CURRENT_LOCATION_TAG)) {
             String jsonCurrentLocation = mSharedPreferences.getString(PREF_CURRENT_LOCATION_TAG, null);
             latLng = gson.fromJson(jsonCurrentLocation, LatLng.class);
+            mSharedPreferences.edit().remove(PREF_CURRENT_LOCATION_TAG).commit();
         }
         return latLng;
     }
@@ -217,7 +218,7 @@ public class OrderTracingService extends Service implements LocationListener, Ro
     @Override
     public void onRoutingSuccess(PolylineOptions mPolyOptions, Route route) {
         Gson gson = new Gson();
-
+        saveCurrentLocation();
         if (mCurrentLocation != null) {
             String jsonCurrentLocation = gson.toJson(mCurrentLocation);
             String jsonRoute = gson.toJson(route);
