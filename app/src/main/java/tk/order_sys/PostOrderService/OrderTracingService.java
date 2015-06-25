@@ -16,7 +16,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
-import android.telephony.gsm.SmsManager;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -26,6 +26,8 @@ import com.directions.route.RoutingListener;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
+
+import java.util.ArrayList;
 
 import tk.order_sys.Postorder.OrdersMapActivity;
 import tk.order_sys.Postorder.R;
@@ -83,7 +85,7 @@ public class OrderTracingService extends Service implements LocationListener, Ro
     public int onStartCommand(Intent intent, int flags, int startId) {
         loadAppSetting();
         isSentSMS = false;
-        String intentAction = intent.getAction();
+         String intentAction = intent.getAction();
 
         if (intentAction.equals(OrdersMapActivity.ORDER_TRACING_SERVICE_ACTION_GET_ROUTING)) {
             Criteria criteria = new Criteria();
@@ -238,7 +240,7 @@ public class OrderTracingService extends Service implements LocationListener, Ro
             LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
         }
 
-        if (checkSentSms(mOrderName) == false && isSendNoticeSms && distanceSendNoticeSms >= route.getLength()) {
+        if (!checkSentSms(mOrderName) && isSendNoticeSms && distanceSendNoticeSms >= route.getLength()) {
             sendNoticeSms();
         }
     }
@@ -302,17 +304,20 @@ public class OrderTracingService extends Service implements LocationListener, Ro
 
     private void sendNoticeSms() {
         try {
+            Log.i("Phone", mPhoneNumber);
             String message = "Đây là tin nhắn nhắc nhỡ về đơn hàng " + mOrderName + " bạn đã đặt. Đơn hàng của bạn đang trên đường tới.";
 
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
-                    new Intent(this, OrderTracingService.class), 0);
+            SmsManager sms = SmsManager.getDefault();
+            ArrayList<PendingIntent> sentIntents = new ArrayList<PendingIntent>();
+            ArrayList<String> multiPartMessages = sms.divideMessage(message);
 
-            SmsManager sms = null;
-            Log.i("Phone", mPhoneNumber);
-            sms = SmsManager.getDefault();
-            sms.sendTextMessage(mPhoneNumber, null, message, pendingIntent, null);
+            for (int i = 0; i < multiPartMessages.size(); i++) {
+                sentIntents.add(PendingIntent.getBroadcast(this, 0, new Intent(this, OrderTracingService.class), 0));
+            }
+
+            sms.sendMultipartTextMessage(mPhoneNumber.toString(), null, multiPartMessages, sentIntents, null);
             saveSentSms(mOrderName);
-            sendNotification("Gỡi tin nhắn nhắc nhỡ đơn hàng " + mOrderName);
+            sendNotification("Đã gỡi tin nhắn nhắc nhỡ đơn hàng " + mOrderName);
         } catch (Exception e) {
             sendNotification("Có lỗi trong quá trình gỡi sms nhắc nhỡ đơn hàng " + mOrderName);
             e.printStackTrace();
