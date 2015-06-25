@@ -27,9 +27,27 @@ public class appConfig {
     }
 
     public static boolean isNetworkAvailable(Context context) {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+//        ConnectivityManager connectivityManager
+//                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+//        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+//        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo[] netInfo = connectivityManager.getAllNetworkInfo();
+
+        //Checks whether the connectivity type is WIFI or MOBILE.
+        for (NetworkInfo networkInfo : netInfo)
+        {
+            if (networkInfo.getTypeName().equalsIgnoreCase("WIFI"))
+                if (networkInfo.isConnected()){
+                    return true;
+
+                }
+            if (networkInfo.getTypeName().equalsIgnoreCase("MOBILE"))
+                if (networkInfo.isConnected()){
+                    return true;
+                }
+        }
+
+        return false;
     }
 }

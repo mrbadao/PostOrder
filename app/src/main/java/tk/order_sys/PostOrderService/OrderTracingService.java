@@ -305,14 +305,18 @@ public class OrderTracingService extends Service implements LocationListener, Ro
     private void sendNoticeSms() {
         try {
             Log.i("Phone", mPhoneNumber);
-            String message = "Đây là tin nhắn nhắc nhỡ về đơn hàng " + mOrderName + " bạn đã đặt. Đơn hàng của bạn đang trên đường tới.";
+            String message = distanceSendNoticeSms > 0
+                    ? "Đơn hàng " + mOrderName + "còn cách bạn :" + distanceSendNoticeSms + "m."
+                    : "Tin nhắn nhắc nhỡ về đơn hàng " + mOrderName + " bạn đặt. Đơn hàng của bạn đang trên đường tới.";
 
             SmsManager sms = SmsManager.getDefault();
             ArrayList<PendingIntent> sentIntents = new ArrayList<PendingIntent>();
             ArrayList<String> multiPartMessages = sms.divideMessage(message);
+            PendingIntent sentPI = PendingIntent.getBroadcast(this, 0,
+                    new Intent(this, OrderTracingService.class), 0);
 
             for (int i = 0; i < multiPartMessages.size(); i++) {
-                sentIntents.add(PendingIntent.getBroadcast(this, 0, new Intent(this, OrderTracingService.class), 0));
+                sentIntents.add(i,sentPI);
             }
 
             sms.sendMultipartTextMessage(mPhoneNumber.toString(), null, multiPartMessages, sentIntents, null);
