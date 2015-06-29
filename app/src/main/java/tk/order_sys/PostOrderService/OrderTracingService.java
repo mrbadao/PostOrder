@@ -241,7 +241,7 @@ public class OrderTracingService extends Service implements LocationListener, Ro
         }
 
         if (!checkSentSms(mOrderName) && isSendNoticeSms && distanceSendNoticeSms >= route.getLength()) {
-            sendNoticeSms();
+            sendNoticeSms(route.getLength());
         }
     }
 
@@ -302,11 +302,11 @@ public class OrderTracingService extends Service implements LocationListener, Ro
         }
     }
 
-    private void sendNoticeSms() {
+    private void sendNoticeSms(int length) {
         try {
             Log.i("Phone", mPhoneNumber);
             String message = distanceSendNoticeSms > 0
-                    ? "Đơn hàng " + mOrderName + "còn cách bạn :" + distanceSendNoticeSms + "m."
+                    ? "Đơn hàng " + mOrderName + "còn cách bạn :" + length + "m."
                     : "Tin nhắn nhắc nhỡ về đơn hàng " + mOrderName + " bạn đặt. Đơn hàng của bạn đang trên đường tới.";
 
             SmsManager sms = SmsManager.getDefault();
